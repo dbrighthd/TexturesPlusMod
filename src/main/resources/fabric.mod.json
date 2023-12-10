@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "texturesplusmod",
+  "version": "${version}",
+  "name": "Textures Plus Mod",
+  "description": "Updates all 4 Textures+ packs from their github repositories on startup. This is a beta version, so there are some optimizations that are not yet implemented (the packs are deleted and redownloaded on *EVERY* startup.",
+  "authors": [],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/texturesplusmod/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "com.dbrighthd.texturesplusmod.client.TexturesplusmodClient"
+    ],
+    "main": [
+      "com.dbrighthd.texturesplusmod.Texturesplusmod"
+    ]
+  },
+  "mixins": [
+    "texturesplusmod.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.14.21",
+    "fabric": "*",
+    "minecraft": "*"
+  },
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.discord": "https://discord.com/WCvwtzW"
+      }
+    }
+  }
+}
