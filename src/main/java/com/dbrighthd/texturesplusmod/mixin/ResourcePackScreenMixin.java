@@ -9,6 +9,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -22,8 +23,10 @@ import static com.dbrighthd.texturesplusmod.client.TexturesplusmodClient.downloa
 
 @Mixin(PackScreen.class)
 public abstract class ResourcePackScreenMixin extends Screen {
-    private static final Identifier textures$FOCUSED = new Identifier(MODID, "textures/gui/buttonfocused.png");
-    private static final Identifier textures$UNFOCUSED = new Identifier(MODID, "textures/gui/buttonunfocused.png");
+    @Unique
+    private static final Identifier textures$FOCUSED = Identifier.of(MODID, "textures/gui/buttonfocused.png");
+    @Unique
+    private static final Identifier textures$UNFOCUSED = Identifier.of(MODID, "textures/gui/buttonunfocused.png");
     @Shadow
     @Final
     private Path file;
@@ -47,7 +50,7 @@ public abstract class ResourcePackScreenMixin extends Screen {
 
                 //thank you Traben for letting me copy this code
                 @Override
-                public void renderButton(DrawContext context, int mouseX, int mouseY, float delta) {
+                public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
                     Identifier identifier = this.isSelected() ? textures$FOCUSED : textures$UNFOCUSED;
                     context.drawTexture(identifier, this.getX(), this.getY(), 0, 0, this.width, this.height, this.width, this.height);
                 }
