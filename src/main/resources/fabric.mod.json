@@ -11,10 +11,10 @@
   "environment": "*",
   "entrypoints": {
     "client": [
-      "com.dbrighthd.texturesplusmod.client.TexturesplusmodClient"
+      "com.dbrighthd.texturesplusmod.client.TexturesPlusModClient"
     ],
     "main": [
-      "com.dbrighthd.texturesplusmod.Texturesplusmod"
+      "com.dbrighthd.texturesplusmod.TexturesPlusMod"
     ]
   },
   "mixins": [
