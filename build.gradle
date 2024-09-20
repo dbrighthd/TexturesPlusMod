@@ -1,10 +1,7 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-
 plugins {
     id 'application'
     id 'fabric-loom' version '1.7-SNAPSHOT'
     id 'maven-publish'
-    id 'com.github.johnrengelman.shadow' version '8.1.1'
     id 'java'
 }
 apply plugin: 'application'
@@ -37,12 +34,7 @@ dependencies {
 application {
     mainClass = 'com.my.App'
 }
-shadow {
-    mainClassName = application.mainClass.get()
-}
-tasks.named('shadowJar', ShadowJar) {
-    enableRelocation true
-}
+
 processResources {
     inputs.property "version", project.version
     filteringCharset "UTF-8"
