@@ -29,12 +29,11 @@ dependencies {
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
     modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
-    shadow include ('com.fasterxml.jackson.core:jackson-databind:2.13.3')
-    shadow include ('com.fasterxml.jackson.core:jackson-annotations:2.13.3')
-    shadow include ('com.fasterxml.jackson.core:jackson-core:2.13.3')
+    modImplementation include ('com.fasterxml.jackson.core:jackson-databind:2.13.3')
+    modImplementation include ('com.fasterxml.jackson.core:jackson-annotations:2.13.3')
+    modImplementation include ('com.fasterxml.jackson.core:jackson-core:2.13.3')
 
 }
-apply plugin: 'com.github.johnrengelman.shadow'
 application {
     mainClass = 'com.my.App'
 }
