@@ -130,4 +130,10 @@ public class Committer{
     public void setSite_admin(boolean site_admin) { 
 		 this.site_admin = site_admin; } 
     boolean site_admin;
+    @JsonProperty("user_view_type")
+    public String getUser_view_type() {
+        return this.user_view_type; }
+    public void setUser_view_type(String user_view_type) {
+        this.user_view_type = user_view_type; }
+    String user_view_type;
 }

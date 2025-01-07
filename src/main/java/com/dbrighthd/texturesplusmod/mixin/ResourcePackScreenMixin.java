@@ -6,6 +6,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.pack.PackScreen;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.TexturedButtonWidget;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
@@ -48,12 +49,14 @@ public abstract class ResourcePackScreenMixin extends Screen {
                     22, (this.height - 40), 22, 22,
                     new ButtonTextures(textures$UNFOCUSED, textures$FOCUSED),
                     (button) -> {
+                        button.setFocused(false);
                         button.active = false;
                         PackGetterUtil.downloadAllPacks().whenComplete(($, err) -> button.active = true);
                     },
                     Text.translatable(MODID + ".open_tooltip"))
                 {
                     private int tick = 0;
+                    private int cooldownTicks = 0;
                     private float deltaAccumulator = 0;
 
                     {
@@ -64,14 +67,22 @@ public abstract class ResourcePackScreenMixin extends Screen {
                     @Override
                     public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
                         deltaAccumulator += delta;
-                        if (deltaAccumulator*1000 >= 50) {
+                        if (deltaAccumulator*1000 >= 200) { // ticks are 4x slower because methinks the animation would look nicer
                             deltaAccumulator = 0;
-                            tick++;
+                            if (cooldownTicks > 0) cooldownTicks--;
+                            else tick++;
+                            if (tick > 18) {
+                                cooldownTicks = 3;
+                                tick = 0;
+                            }
                         }
-                        Identifier identifier = !this.active ? textures$DISABLED : this.isSelected() ? textures$FOCUSED : textures$UNFOCUSED;
-                        context.drawTexture(identifier, this.getX(), this.getY(), 0, 0, this.width, this.height, this.width, this.height);
+                        Identifier identifier = !this.active ? textures$DISABLED : switch (this.getType()) {
+                            case NONE -> textures$UNFOCUSED;
+                            case HOVERED, FOCUSED -> textures$FOCUSED;
+                        };
+                        context.drawTexture(RenderLayer::getGuiTextured, identifier, this.getX(), this.getY(), 0, 0, this.width, this.height, this.width, this.height);
                         if (!this.active) {
-                            context.drawTexture(textures$LOADING, this.getX(), this.getY(), this.width, this.height, 0,  32*(tick % 18), 32, 32, 32, 576);
+                            context.drawTexture(RenderLayer::getGuiTextured, textures$LOADING, this.getX(), this.getY(), 0,  32*tick, this.width, this.height, 32, 32, 32, 576);
                         }
                     }
                 });

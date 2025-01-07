@@ -15,6 +15,9 @@
     ],
     "main": [
       "com.dbrighthd.texturesplusmod.TexturesPlusMod"
+    ],
+    "modmenu": [
+      "com.dbrighthd.texturesplusmod.TexturesPlusModMenu"
     ]
   },
   "mixins": [
