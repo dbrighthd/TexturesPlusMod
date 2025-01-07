@@ -1,0 +1,7 @@
+{
+  "text.autoconfig.texturesplusmod.option.async": "Async",
+  "text.autoconfig.texturesplusmod.option.async.@Tooltip[0]": "[BETA] Enables asynchronous downloading.",
+  "text.autoconfig.texturesplusmod.option.async.@Tooltip[1]": "Prevents the downloading button from freezing minecraft,",
+  "text.autoconfig.texturesplusmod.option.async.@Tooltip[2]": "creates issues with resourcepacks disabling themselves",
+  "text.autoconfig.texturesplusmod.option.async.@Tooltip[3]": "on launch"
+}

@@ -3,7 +3,7 @@
   "id": "texturesplusmod",
   "version": "${version}",
   "name": "Textures Plus Mod",
-  "description": "Updates all 4 Textures+ packs from their github repositories on startup. This is a beta version, so there are some optimizations that are not yet implemented (the packs are deleted and redownloaded on *EVERY* startup.",
+  "description": "Updates all 4 Textures+ packs from their github repositories on startup.",
   "authors": [],
   "contact": {},
   "license": "MIT",
@@ -11,10 +11,13 @@
   "environment": "*",
   "entrypoints": {
     "client": [
-      "com.dbrighthd.texturesplusmod.client.TexturesplusmodClient"
+      "com.dbrighthd.texturesplusmod.client.TexturesPlusModClient"
     ],
     "main": [
-      "com.dbrighthd.texturesplusmod.Texturesplusmod"
+      "com.dbrighthd.texturesplusmod.TexturesPlusMod"
+    ],
+    "modmenu": [
+      "com.dbrighthd.texturesplusmod.TexturesPlusModMenu"
     ]
   },
   "mixins": [

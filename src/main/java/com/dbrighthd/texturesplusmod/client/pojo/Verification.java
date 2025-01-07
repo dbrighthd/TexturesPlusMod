@@ -25,4 +25,10 @@ public class Verification{
     public void setPayload(Object payload) { 
 		 this.payload = payload; } 
     Object payload;
+    @JsonProperty("verified_at")
+    public String getVerifiedAt() {
+        return this.verifiedAt; }
+    public void setVerifiedAt(String verifiedAt) {
+        this.verifiedAt = verifiedAt; }
+    String verifiedAt;
 }
