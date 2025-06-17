@@ -1,6 +1,5 @@
 package com.dbrighthd.texturesplusmod;
 
-import com.dbrighthd.texturesplusmod.client.TexturesPlusModClient;
 import com.dbrighthd.texturesplusmod.client.pojo.LatestCommit;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
@@ -8,16 +7,14 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.http.HttpException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import oshi.util.tuples.Pair;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -32,7 +29,7 @@ public class PackGetterUtil {
 
     public static void downloadFile(URL url, String fileName) throws Exception { // this is left alone, it's fine as is.
         try (InputStream in = url.openStream()) {
-            Files.copy(in, Paths.get(fileName));
+            Files.copy(in, Paths.get(fileName), StandardCopyOption.REPLACE_EXISTING);
         }
     }
 
@@ -66,7 +63,7 @@ public class PackGetterUtil {
         }
     }
 
-    public static String downloadResourcePackSync(String pack) throws Exception {
+    public static Pair<String, Boolean> downloadResourcePackSync(String pack) throws Exception {
         LatestCommit commit;
         String branch = pack.equals("creatures") ? "master" : "main";
         Path pathToPack = Paths.get("resourcepacks/" + pack + "plus/"); // only used for logging.
@@ -93,7 +90,7 @@ public class PackGetterUtil {
                     brTest.close();
                     if (currentHash.equals(commit.getSha())) {
                         LOGGER.info("{}+ is already up to date!", pack);
-                        return pathToPack.toAbsolutePath().toString();
+                        return new Pair<>(pathToPack.toAbsolutePath().toString(), false);
                     }
                 } else {
                     LOGGER.warn("{}+ is missing its hash! Re-downloading...", pack);
@@ -128,16 +125,16 @@ public class PackGetterUtil {
             writer.println(commit.getSha());
             writer.close();
             LOGGER.info("Finished downloading and extracting {}+!", pack);
-            return pathToPack.toAbsolutePath().toString();
+            return new Pair<>(pathToPack.toAbsolutePath().toString(), true);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             throw e;
         }
     }
 
-    public static CompletableFuture<String> downloadResourcePackAsync(String pack)
+    public static CompletableFuture<Pair<String, Boolean>> downloadResourcePackAsync(String pack)
     {
-        CompletableFuture<String> future = new CompletableFuture<>();
+        CompletableFuture<Pair<String, Boolean>> future = new CompletableFuture<>();
         POOL.submit(() -> {
             try {
                 future.complete(downloadResourcePackSync(pack));
@@ -148,8 +145,8 @@ public class PackGetterUtil {
         return future;
     }
 
-    public static CompletableFuture<String> downloadResourcePack(String pack, boolean sync) {
-        CompletableFuture<String> future;
+    public static CompletableFuture<Pair<String, Boolean>> downloadResourcePack(String pack, boolean sync) {
+        CompletableFuture<Pair<String, Boolean>> future;
         if (sync) {
             future = new CompletableFuture<>();
             try {
@@ -163,9 +160,44 @@ public class PackGetterUtil {
         return future;
     }
 
-    public static CompletableFuture<Void> downloadAllPacks()
-    {
-        boolean async = TexturesPlusModClient.getConfig().async;
-        return CompletableFuture.allOf(downloadResourcePack("elytras", !async), downloadResourcePack("pumpkins", !async), downloadResourcePack("weapons", !async), downloadResourcePack("creatures", !async));
+    private static boolean didElytrasUpdate = false;
+    private static boolean didPumpkinsUpdate = false;
+    private static boolean didWeaponsUpdate = false;
+    private static boolean didCreaturesUpdate = false;
+
+    public static boolean didAnyUpdate() {
+        return didElytrasUpdate || didWeaponsUpdate || didPumpkinsUpdate || didCreaturesUpdate;
+    }
+
+    public static CompletableFuture<Void> downloadAllPacks(boolean async) {
+        CompletableFuture<Pair<String, Boolean>> elytras = downloadResourcePack("elytras", !async);
+        CompletableFuture<Pair<String, Boolean>> pumpkins = downloadResourcePack("pumpkins", !async);
+        CompletableFuture<Pair<String, Boolean>> weapons = downloadResourcePack("weapons", !async);
+        CompletableFuture<Pair<String, Boolean>> creatures = downloadResourcePack("creatures", !async);
+        elytras.whenComplete((s, e) -> {
+            didElytrasUpdate = s.getB();
+        });
+        pumpkins.whenComplete((s, e) -> {
+            didPumpkinsUpdate = s.getB();
+        });
+        weapons.whenComplete((s, e) -> {
+            didWeaponsUpdate = s.getB();
+        });
+        creatures.whenComplete((s, e) -> {
+            didCreaturesUpdate = s.getB();
+        });
+        return CompletableFuture.allOf(elytras, pumpkins, weapons, creatures);
+    }
+
+    public static String getTexturesPlusPackId(String pack) {
+        return getResourcePackIdFromPath(getPathFromTexturesPlusName(pack));
+    }
+
+    public static Path getPathFromTexturesPlusName(String name) {
+        return Paths.get("resourcepacks/" + name + "plus/");
+    }
+
+    public static String getResourcePackIdFromPath(Path path) {
+        return "file/" + path.getFileName().toString();
     }
 }
