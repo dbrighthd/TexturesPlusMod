@@ -3,13 +3,13 @@ import com.dbrighthd.texturesplusmod.PackGetterUtil;
 import com.dbrighthd.texturesplusmod.client.TexturesPlusModClient;
 import com.dbrighthd.texturesplusmod.client.screen.ReloadPrompt;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ButtonTextures;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.pack.PackScreen;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.TexturedButtonWidget;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.resource.ResourcePackManager;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -117,9 +117,9 @@ public abstract class ResourcePackScreenMixin extends Screen {
                         case NONE -> textures$UNFOCUSED;
                         case HOVERED, FOCUSED -> textures$FOCUSED;
                     };
-                    context.drawTexture(RenderLayer::getGuiTextured, identifier, this.getX(), this.getY(), 0, 0, this.width, this.height, this.width, this.height);
+                    context.drawTexture(RenderPipelines.GUI_TEXTURED, identifier, this.getX(), this.getY(), 0, 0, this.width, this.height, this.width, this.height);
                     if (!this.active) {
-                        context.drawTexture(RenderLayer::getGuiTextured, textures$LOADING, this.getX(), this.getY(), 0,  32*tick, this.width, this.height, 32, 32, 32, 576);
+                        context.drawTexture(RenderPipelines.GUI_TEXTURED, textures$LOADING, this.getX(), this.getY(), 0,  32*tick, this.width, this.height, 32, 32, 32, 576);
                     }
                 }
             };
