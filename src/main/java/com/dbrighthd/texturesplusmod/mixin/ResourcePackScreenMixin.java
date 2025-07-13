@@ -1,7 +1,9 @@
 package com.dbrighthd.texturesplusmod.mixin;
 import com.dbrighthd.texturesplusmod.PackGetterUtil;
+import com.dbrighthd.texturesplusmod.TexturesPlusWorldGenerator;
 import com.dbrighthd.texturesplusmod.client.TexturesPlusModClient;
 import com.dbrighthd.texturesplusmod.client.screen.ReloadPrompt;
+import me.shedaniel.autoconfig.AutoConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
@@ -20,6 +22,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Shadow;
+import com.dbrighthd.texturesplusmod.client.config.ModConfig;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 
@@ -68,6 +72,15 @@ public abstract class ResourcePackScreenMixin extends Screen {
                         Collection<String> previouslyEnabledPacks = resourcePackManager.getEnabledIds();
                         PackGetterUtil.downloadAllPacks(TexturesPlusModClient.getConfig().async).whenComplete(($, err) -> {
                             button.active = true;
+                            if(TexturesPlusModClient.getConfig().makeWorld)
+                            {
+                                try {
+                                    TexturesPlusWorldGenerator.generateWorld();
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+
                             if (!PackGetterUtil.didAnyUpdate()) {
                                 System.out.println("None to update.");
                                 return;
@@ -88,6 +101,7 @@ public abstract class ResourcePackScreenMixin extends Screen {
                                     }, false));
                                 });
                             }
+
                         });
                     },
                     Text.translatable(MODID + ".open_tooltip"))

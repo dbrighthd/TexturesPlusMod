@@ -1,6 +1,7 @@
 package com.dbrighthd.texturesplusmod.client;
 
 import com.dbrighthd.texturesplusmod.PackGetterUtil;
+import com.dbrighthd.texturesplusmod.TexturesPlusWorldGenerator;
 import com.dbrighthd.texturesplusmod.client.config.ModConfig;
 import com.mojang.blaze3d.systems.RenderSystem;
 import me.shedaniel.autoconfig.AutoConfig;
@@ -9,9 +10,10 @@ import net.fabricmc.api.ClientModInitializer;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.util.collection.ArrayListDeque;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 @net.fabricmc.api.Environment(net.fabricmc.api.EnvType.CLIENT)
 public class TexturesPlusModClient implements ClientModInitializer {
@@ -32,6 +34,14 @@ public class TexturesPlusModClient implements ClientModInitializer {
                     LOGGER.error("There was an error while fetching textures+ packs", e);
                 }
             });
+            if(getConfig().makeWorld)
+            {
+                try {
+                    TexturesPlusWorldGenerator.generateWorld();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
             LOGGER.info("Finished fetching textures+ packs!");
         }
 
