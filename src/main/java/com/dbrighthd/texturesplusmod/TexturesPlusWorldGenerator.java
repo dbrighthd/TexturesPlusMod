@@ -30,7 +30,8 @@ public class TexturesPlusWorldGenerator {
             }
             Files.copy(in, tempZip, StandardCopyOption.REPLACE_EXISTING);
             unzipWorldFileToSaves(tempZip, "TexturesPlusGenerated");  // unzip into the saves directory
-            TexturesPlusDatapackGenerator.pumpkinsList();
+            TexturesPlusDatapackGenerator.generatePumpkinsMcfunction();
+            TexturesPlusDatapackGenerator.generateElytrasMcfunction();
         }
 
 
