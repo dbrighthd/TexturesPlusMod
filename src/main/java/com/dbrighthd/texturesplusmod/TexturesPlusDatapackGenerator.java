@@ -39,7 +39,10 @@ public class TexturesPlusDatapackGenerator {
             for (JsonNode caseNode : cases) {
                 JsonNode whenNode = caseNode.get("when");
                 JsonNode modelPathNode = caseNode.path("model").path("model");
-
+                if(modelPathNode == null || !modelPathNode.isTextual())
+                {
+                    modelPathNode = caseNode.path("model").path("fallback").path("model");
+                }
                 if (whenNode != null && modelPathNode != null && modelPathNode.isTextual()) {
                     String modelPath = modelPathNode.asText();
                     String firstWhen = null;
