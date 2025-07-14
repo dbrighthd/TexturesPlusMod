@@ -14,6 +14,9 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip(count = 1)
     public boolean makeWorld = false;
 
+    @ConfigEntry.Gui.Tooltip(count = 1)
+    public boolean elytraArmorStands = false;
+
     @ConfigEntry.Gui.Tooltip(count = 3)
     public boolean devMode = false;
 }

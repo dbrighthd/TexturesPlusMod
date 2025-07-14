@@ -233,25 +233,30 @@ public class TexturesPlusDatapackGenerator {
         Collections.sort(misc);
         Collections.sort(cape);
 
+        String append = "";
+        if(!TexturesPlusModClient.getConfig().elytraArmorStands)
+        {
+            append = "noarmor";
+        }
         //block, 25 -53 -14, red, north,
-        createElytraRow(sb, block, 25, -53, -14, "red_concrete", "north", gapSize);
+        createElytraRow(sb, block, 25, -53, -14, "red_concrete", "north", gapSize, append);
         //wing: 25 -53 -8 orance concrete, north
-        createElytraRow(sb, animalwings, 25, -53, -8, "orange_concrete", "north", gapSize);
+        createElytraRow(sb, animalwings, 25, -53, -8, "orange_concrete", "north", gapSize, append);
 
-        createElytraRow(sb, color, 25, -53, -2, "yellow_concrete", "north", gapSize);
+        createElytraRow(sb, color, 25, -53, -2, "yellow_concrete", "north", gapSize, append);
 
-        createElytraRow(sb, flag, 25, -53, 2, "lime_concrete", "south", gapSize);
+        createElytraRow(sb, flag, 25, -53, 2, "lime_concrete", "south", gapSize, append);
 
-        createElytraRow(sb,  misc, 25, -53, 8, "blue_concrete", "south", gapSize);
+        createElytraRow(sb,  misc, 25, -53, 8, "blue_concrete", "south", gapSize, append);
 
-        createCapeRow(sb,  cape, 25, -53, 14, "purple_concrete", "south");
+        createCapeRow(sb,  cape, 25, -53, 14, "purple_concrete", "south", append);
 
         Path functionPath = Paths.get(MinecraftClient.getInstance().runDirectory.getPath(), "saves", "TexturesPlusGenerated","datapacks","texturesplus","data","texturesplus","function","allelytras.mcfunction");
 
         Files.writeString(functionPath, sb.toString(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
     }
 
-    static void createElytraRow(StringBuilder sb, List<String> names, int x, int y, int z, String block, String direction, Map<String, Integer> gapSize)
+    static void createElytraRow(StringBuilder sb, List<String> names, int x, int y, int z, String block, String direction, Map<String, Integer> gapSize, String arg)
     {
         for (String name : names)
         {
@@ -259,7 +264,7 @@ public class TexturesPlusDatapackGenerator {
             {
                 x += gapSize.get(name)-1;
             }
-            sb.append(generateCommand(x,y,z,name,block,direction,"elytra")).append("\n");
+            sb.append(generateCommand(x,y,z,name,block,direction,"elytra" + arg)).append("\n");
             if(gapSize.containsKey(name))
             {
                 x += gapSize.get(name)-1;
@@ -268,11 +273,11 @@ public class TexturesPlusDatapackGenerator {
         }
     }
 
-    static void createCapeRow(StringBuilder sb, List<String> names, int x, int y, int z, String block, String direction)
+    static void createCapeRow(StringBuilder sb, List<String> names, int x, int y, int z, String block, String direction, String arg)
     {
         for (String name : names)
         {
-            sb.append(generateCommand(x,y,z,name,block,direction,"capeleytra")).append("\n");
+            sb.append(generateCommand(x,y,z,name,block,direction,"capeleytra"+ arg)).append("\n");
             x +=2;
         }
     }
