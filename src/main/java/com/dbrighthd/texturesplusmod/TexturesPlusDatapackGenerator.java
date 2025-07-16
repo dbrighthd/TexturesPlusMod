@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
 
+import static com.mojang.text2speech.Narrator.LOGGER;
+
 public class TexturesPlusDatapackGenerator {
     public static void generatePumpkinsMcfunction() throws IOException {
         // Path to your JSON file
@@ -304,8 +306,8 @@ public class TexturesPlusDatapackGenerator {
 
         for (Map.Entry<String, List<TexturesPlusItem>> entry : itemMap.entrySet()) {
 
-            String key          = entry.getKey();       // the selector
-            List<TexturesPlusItem> renames = entry.getValue();     // the payload
+            String key = entry.getKey();
+            List<TexturesPlusItem> renames = entry.getValue();
 
             if(key.contains("shield") || key.contains("totem"))
             {
@@ -314,6 +316,10 @@ public class TexturesPlusDatapackGenerator {
             else if(key.contains("hoe"))
             {
                 hoes.addAll(renames);
+            }
+            else if(key.contains("pickaxe"))
+            {
+                misc.addAll(renames);
             }
             else if(key.contains("axe"))
             {
@@ -418,39 +424,37 @@ public class TexturesPlusDatapackGenerator {
     }
     public static TexturesPlusItem getConditionsRecur(List<String> enchants, JsonNode node, String itemType, String firstWhen, int damage)
     {
-        if(node.has("model"))
-        {
-            node = node.get("model");
-        }
-        if(node.has("type") && node.get("type").asText().contains("model"))
-        {
-            String modelPath = null;
-            modelPath = node.get("model").asText();
-            return new TexturesPlusItem(new ArrayList<String>(), firstWhen, 0, itemType, modelPath);
-        }
-        if(node.has("predicate") && node.get("predicate").asText().contains("minecraft:enchantments"))
-        {
-            for (JsonNode entry : node.path("value")) {        // iterate the array
-                String id = entry.path("enchantments").asText(null);
-                if (id != null) enchants.add(id);
+        try {
+            if (node.has("model")) {
+                node = node.get("model");
             }
-        }
-        if(node.has("predicate") && node.get("predicate").asText().contains("minecraft:damage"))
-        {
-            damage = Integer.parseInt(node.get("value").get("damage").get("min").asText());
-        }
-        if(node.get("type") != null && node.get("type").asText().contains("condition"))
-        {
-            if(node.get("on_true").get("type").asText().contains("model"))
-            {
-                return new TexturesPlusItem(enchants, firstWhen, damage, itemType, node.get("on_true").get("model").asText());
+            if (node.has("type") && node.get("type").asText().contains("model")) {
+                String modelPath = null;
+                modelPath = node.get("model").asText();
+                return new TexturesPlusItem(new ArrayList<String>(), firstWhen, 0, itemType, modelPath);
             }
-            else
-            {
-                return getConditionsRecur(enchants, node.get("on_true"), itemType, firstWhen, damage);
+            if (node.has("predicate") && node.get("predicate").asText().contains("minecraft:enchantments")) {
+                for (JsonNode entry : node.path("value")) {        // iterate the array
+                    String id = entry.path("enchantments").asText(null);
+                    if (id != null) enchants.add(id);
+                }
             }
+            if (node.has("predicate") && node.get("predicate").asText().contains("minecraft:damage")) {
+                damage = Integer.parseInt(node.get("value").get("damage").get("min").asText());
+            }
+            if (node.get("type") != null && node.get("type").asText().contains("condition")) {
+                if (node.get("on_true").get("type").asText().contains("model")) {
+                    return new TexturesPlusItem(enchants, firstWhen, damage, itemType, node.get("on_true").get("model").asText());
+                } else {
+                    return getConditionsRecur(enchants, node.get("on_true"), itemType, firstWhen, damage);
+                }
+            }
+            return null;
+        } catch (Exception e) {
+            LOGGER.error("Failed to parse item", e);
+            return null;
         }
-        return null;
+
     }
 
     static String getSpecialBlock(String itemName, String block)
