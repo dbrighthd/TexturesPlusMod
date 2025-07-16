@@ -32,6 +32,7 @@ public class TexturesPlusWorldGenerator {
             unzipWorldFileToSaves(tempZip, "TexturesPlusGenerated");  // unzip into the saves directory
             TexturesPlusDatapackGenerator.generatePumpkinsMcfunction();
             TexturesPlusDatapackGenerator.generateElytrasMcfunction();
+            TexturesPlusDatapackGenerator.generateWeaponsMcfunction();
         }
 
 

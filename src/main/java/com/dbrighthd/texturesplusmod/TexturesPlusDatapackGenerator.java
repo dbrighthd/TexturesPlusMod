@@ -4,12 +4,10 @@ import com.dbrighthd.texturesplusmod.client.TexturesPlusModClient;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.RenderPhase;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
 import java.util.*;
 
 public class TexturesPlusDatapackGenerator {
@@ -285,9 +283,240 @@ public class TexturesPlusDatapackGenerator {
         }
     }
 
+    public static void generateWeaponsMcfunction() throws IOException {
+        // Path to your JSON file
+        String weaponsPath = "weaponsplus";
+        if (TexturesPlusModClient.getConfig().devMode) {
+            weaponsPath = "weapons";
+        }
+        Path dir = Paths.get(MinecraftClient.getInstance().runDirectory.getPath(), "resourcepacks", weaponsPath,"assets","minecraft","items");
+        Map<String,List<TexturesPlusItem>> itemMap = new HashMap<String,List<TexturesPlusItem>>();
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir, "*.json")) {
+            for (Path path : stream) {
+                generateMapEntry(itemMap, path);
+            }
+        }
+        List<TexturesPlusItem> misc = new ArrayList<TexturesPlusItem>();
+        List<TexturesPlusItem> shieldtotems = new ArrayList<TexturesPlusItem>();
+        List<TexturesPlusItem> hoes = new ArrayList<TexturesPlusItem>();
+        List<TexturesPlusItem> axes = new ArrayList<TexturesPlusItem>();
+        List<TexturesPlusItem> swords = new ArrayList<TexturesPlusItem>();
+
+        for (Map.Entry<String, List<TexturesPlusItem>> entry : itemMap.entrySet()) {
+
+            String key          = entry.getKey();       // the selector
+            List<TexturesPlusItem> renames = entry.getValue();     // the payload
+
+            if(key.contains("shield") || key.contains("totem"))
+            {
+                shieldtotems.addAll(renames);
+            }
+            else if(key.contains("hoe"))
+            {
+                hoes.addAll(renames);
+            }
+            else if(key.contains("axe"))
+            {
+                axes.addAll(renames);
+            }
+            else if(key.contains("sword"))
+            {
+                swords.addAll(renames);
+            }
+            else
+            {
+                misc.addAll(renames);
+            }
+        }
+
+        StringBuilder sb = new StringBuilder();
+        //misc -25 -53 14, red_concrete, south
+        createWeaponRow(sb,misc,-25,-53,14,"red_concrete","south");
+        //shieldtotems -25 -53 8, orange_concrete, south
+        createWeaponRow(sb,shieldtotems,-25,-53,8,"orange_concrete","south");
+        //hoes -25 -53 2, yellow_concrete, south
+        createWeaponRow(sb,hoes,-25,-53,2,"yellow_concrete","south");
+        //axes -25 -53 -2, lime_concrete, north
+        createWeaponRow(sb,axes,-25,-53,-2,"lime_concrete","north");
+        //swords -25 -53 -8, blue_concrete, north
+        createWeaponRow(sb,swords,-25,-53,-8,"blue_concrete","north");
+
+        Path functionPath = Paths.get(MinecraftClient.getInstance().runDirectory.getPath(), "saves", "TexturesPlusGenerated","datapacks","texturesplus","data","texturesplus","function","allweapons.mcfunction");
+
+        Files.writeString(functionPath, sb.toString(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+    }
+
+    static void createWeaponRow(StringBuilder sb, List<TexturesPlusItem> items, int x, int y, int z, String block, String direction)
+    {
+        for (TexturesPlusItem item : items)
+        {
+            if(item.enchantments.isEmpty())
+            {
+                sb.append(generateWeaponCommand(x,y,z,item.rename,block,direction,item.damage, item.itemType,getSpecialBlock(item.itemType, block))).append("\n");
+            }
+            else
+            {
+                sb.append(generateEnchantedWeaponCommand(x,y,z,item.rename,block,direction,item.damage, item.enchantments.getFirst(), item.itemType,getSpecialBlock(item.itemType, block))).append("\n");
+            }
+            x -=1;
+        }
+    }
+
+    public static void generateMapEntry(Map<String,List<TexturesPlusItem>> itemMap, Path jsonFile)
+    {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode root = null;
+        try {
+            root = mapper.readTree(jsonFile.toFile());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        String itemName = jsonFile.getFileName().toString().replace(".json","");
+        JsonNode cases = root.path("model").path("cases");
+        List<TexturesPlusItem> allRenameCases = new ArrayList<TexturesPlusItem>();
+        if (cases.isArray()) {
+            for (JsonNode caseNode : cases) {
+                getConditions(itemName, allRenameCases,caseNode);
+            }
+        }
+        itemMap.put(itemName, allRenameCases);
+
+
+    }
+
+    public static void getConditions(String itemType, List<TexturesPlusItem> itemJsonData, JsonNode currCase)
+    {
+        JsonNode node = currCase.get("model");
+        if(node == null)
+        {
+            return;
+        }
+        String firstWhen = null;
+        String modelPath = null;
+        JsonNode whenNode = currCase.get("when");
+        if (whenNode.isArray() && whenNode.size() > 0) {
+            firstWhen = whenNode.get(0).asText();
+        }
+        else if (whenNode.isTextual()) {
+            firstWhen = whenNode.asText();
+        }
+        if(node.get("type").asText().contains("model"))
+        {
+            modelPath = node.get("model").asText();
+            itemJsonData.add(new TexturesPlusItem(new ArrayList<String>(), firstWhen, 0, itemType, modelPath));
+            return;
+        }
+        else
+        {
+            TexturesPlusItem itemToAdd = getConditionsRecur(new ArrayList<String>(), currCase, itemType, firstWhen, 0);
+            if(itemToAdd != null)
+            {
+                itemJsonData.add(itemToAdd);
+            }
+        }
+
+    }
+    public static TexturesPlusItem getConditionsRecur(List<String> enchants, JsonNode node, String itemType, String firstWhen, int damage)
+    {
+        if(node.has("model"))
+        {
+            node = node.get("model");
+        }
+        if(node.has("type") && node.get("type").asText().contains("model"))
+        {
+            String modelPath = null;
+            modelPath = node.get("model").asText();
+            return new TexturesPlusItem(new ArrayList<String>(), firstWhen, 0, itemType, modelPath);
+        }
+        if(node.has("predicate") && node.get("predicate").asText().contains("minecraft:enchantments"))
+        {
+            for (JsonNode entry : node.path("value")) {        // iterate the array
+                String id = entry.path("enchantments").asText(null);
+                if (id != null) enchants.add(id);
+            }
+        }
+        if(node.has("predicate") && node.get("predicate").asText().contains("minecraft:damage"))
+        {
+            damage = Integer.parseInt(node.get("value").get("damage").get("min").asText());
+        }
+        if(node.get("type") != null && node.get("type").asText().contains("condition"))
+        {
+            if(node.get("on_true").get("type").asText().contains("model"))
+            {
+                return new TexturesPlusItem(enchants, firstWhen, damage, itemType, node.get("on_true").get("model").asText());
+            }
+            else
+            {
+                return getConditionsRecur(enchants, node.get("on_true"), itemType, firstWhen, damage);
+            }
+        }
+        return null;
+    }
+
+    static String getSpecialBlock(String itemName, String block)
+    {
+        if(itemName.contains("wooden"))
+        {
+            return "oak_planks";
+        }
+        if(itemName.contains("diamond"))
+        {
+            return "diamond_block";
+        }
+        if(itemName.contains("iron"))
+        {
+            return "iron_block";
+        }
+        if(itemName.contains("golden"))
+        {
+            return "gold_block";
+        }
+        if(itemName.contains("stone"))
+        {
+            if(itemName.contains("redstone"))
+            {
+                return block;
+            }
+            return "stone";
+        }
+        if(itemName.contains("netherite"))
+        {
+            return "netherite_block";
+        }
+        else
+        {
+            return block;
+        }
+    }
+    static String generateWeaponCommand(int x, int y, int z, String rename, String block, String direction, int damage, String item, String specialBlock)
+    {
+        return "function texturesplus:weapons/place1weapon" + direction + " {item:\""+ item + "\",x: \"" + x + "\", y: \"" + y + "\", z: \"" + z + "\",rename: \"" + rename + "\",block: \"" + block +"\",special_block:\""+specialBlock + "\",damage:"+ damage +"}";
+    }
+    static String generateEnchantedWeaponCommand(int x, int y, int z, String rename, String block, String direction, int damage, String enchant, String item, String specialBlock)
+    {
+        return "function texturesplus:weapons/place1weaponenchant" + direction + " {item:\""+ item + "\",x: \"" + x + "\", y: \"" + y + "\", z: \"" + z + "\",rename: \"" + rename + "\",block: \"" + block+"\",special_block:\""+specialBlock + "\",damage:"+ damage +",enchantment:\""+enchant+"\"}";
+    }
+
     static String generateCommand(int x, int y, int z, String rename, String block, String direction, String command)
     {
         return "function texturesplus:place" + command + direction + " {x: \"" + x + "\", y: \"" + y + "\", z: \"" + z + "\",rename: \"" + rename + "\",block: \"" + block + "\"}";
     }
 
+    public static class TexturesPlusItem {
+        public final String itemType;
+        public final List<String> enchantments;
+        public final String rename;
+        public final int damage;
+        public final String model;
+
+        public TexturesPlusItem(List<String> enchantments, String rename, int damage, String itemType, String model) {
+            this.enchantments = Collections.unmodifiableList(
+                    new ArrayList<>(Objects.requireNonNullElse(enchantments, List.of()))
+            );
+            this.rename = rename;
+            this.damage = damage;
+            this.itemType = itemType;
+            this.model = model;
+        }
+    }
 }
