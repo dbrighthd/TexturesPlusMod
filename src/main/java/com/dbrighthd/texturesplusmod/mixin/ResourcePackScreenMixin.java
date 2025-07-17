@@ -72,14 +72,6 @@ public abstract class ResourcePackScreenMixin extends Screen {
                         Collection<String> previouslyEnabledPacks = resourcePackManager.getEnabledIds();
                         PackGetterUtil.downloadAllPacks(TexturesPlusModClient.getConfig().async).whenComplete(($, err) -> {
                             button.active = true;
-                            if(TexturesPlusModClient.getConfig().makeWorld)
-                            {
-                                try {
-                                    TexturesPlusWorldGenerator.generateWorld();
-                                } catch (IOException e) {
-                                    throw new RuntimeException(e);
-                                }
-                            }
 
                             if (!PackGetterUtil.didAnyUpdate()) {
                                 System.out.println("None to update.");

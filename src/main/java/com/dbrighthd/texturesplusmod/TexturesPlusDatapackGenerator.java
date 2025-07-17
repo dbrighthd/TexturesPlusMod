@@ -5,6 +5,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderPhase;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
+import net.minecraft.util.Identifier;
 
 import java.io.IOException;
 import java.nio.file.*;
@@ -14,6 +18,7 @@ import static com.mojang.text2speech.Narrator.LOGGER;
 
 public class TexturesPlusDatapackGenerator {
     public static void generatePumpkinsMcfunction() throws IOException {
+        LOGGER.info("Generating Pumpkins+ placement in world...");
         // Path to your JSON file
         String pumpkinPath = "pumpkinsplus";
         if(TexturesPlusModClient.getConfig().devMode)
@@ -120,6 +125,7 @@ public class TexturesPlusDatapackGenerator {
     }
 
     public static void generateElytrasMcfunction() throws IOException {
+        LOGGER.info("Generating Elytras+ placement in world...");
         // Path to your JSON file
         String elytraPath = "elytrasplus";
         if(TexturesPlusModClient.getConfig().devMode)
@@ -286,6 +292,7 @@ public class TexturesPlusDatapackGenerator {
     }
 
     public static void generateWeaponsMcfunction() throws IOException {
+        LOGGER.info("Generating Weapons+ placement in world...");
         // Path to your JSON file
         String weaponsPath = "weaponsplus";
         if (TexturesPlusModClient.getConfig().devMode) {
@@ -395,6 +402,7 @@ public class TexturesPlusDatapackGenerator {
         JsonNode node = currCase.get("model");
         if(node == null)
         {
+            LOGGER.error("Model wasnt found for an item in " + itemType);
             return;
         }
         String firstWhen = null;
@@ -414,24 +422,28 @@ public class TexturesPlusDatapackGenerator {
         }
         else
         {
-            TexturesPlusItem itemToAdd = getConditionsRecur(new ArrayList<String>(), currCase, itemType, firstWhen, 0);
-            if(itemToAdd != null)
+            if(currCase.has("model"))
             {
-                itemJsonData.add(itemToAdd);
+                currCase = currCase.get("model");
+            }
+
+            List<TexturesPlusItem> itemsToAdd = getConditionsRecur(new ArrayList<String>(), currCase, itemType, firstWhen, 0);
+            if(!itemsToAdd.isEmpty())
+            {
+                itemJsonData.addAll(itemsToAdd);
             }
         }
 
     }
-    public static TexturesPlusItem getConditionsRecur(List<String> enchants, JsonNode node, String itemType, String firstWhen, int damage)
+    public static List<TexturesPlusItem> getConditionsRecur(List<String> enchants, JsonNode node, String itemType, String firstWhen, int damage)
     {
+        List<TexturesPlusItem> foundItems = new ArrayList<TexturesPlusItem>();
         try {
-            if (node.has("model")) {
-                node = node.get("model");
-            }
+
             if (node.has("type") && node.get("type").asText().contains("model")) {
                 String modelPath = null;
                 modelPath = node.get("model").asText();
-                return new TexturesPlusItem(new ArrayList<String>(), firstWhen, 0, itemType, modelPath);
+                foundItems.add(new TexturesPlusItem(new ArrayList<String>(), firstWhen, 0, itemType, modelPath));
             }
             if (node.has("predicate") && node.get("predicate").asText().contains("minecraft:enchantments")) {
                 for (JsonNode entry : node.path("value")) {        // iterate the array
@@ -440,21 +452,80 @@ public class TexturesPlusDatapackGenerator {
                 }
             }
             if (node.has("predicate") && node.get("predicate").asText().contains("minecraft:damage")) {
-                damage = Integer.parseInt(node.get("value").get("damage").get("min").asText());
+                damage = node.get("value").get("damage").get("min").asInt();
             }
             if (node.get("type") != null && node.get("type").asText().contains("condition")) {
                 if (node.get("on_true").get("type").asText().contains("model")) {
-                    return new TexturesPlusItem(enchants, firstWhen, damage, itemType, node.get("on_true").get("model").asText());
+                    foundItems.add(new TexturesPlusItem(enchants, firstWhen, damage, itemType, node.get("on_true").get("model").asText()));
                 } else {
-                    return getConditionsRecur(enchants, node.get("on_true"), itemType, firstWhen, damage);
+                    if(!node.get("property").asText().contains("selected"))
+                    {
+                        foundItems.addAll(getConditionsRecur(enchants, node.get("on_true"), itemType, firstWhen, damage));
+                    }
+                    foundItems.addAll(getConditionsRecur(enchants, node.get("on_false"), itemType, firstWhen, damage));
                 }
             }
-            return null;
+            if (node.get("type") != null && node.get("type").asText().contains("range_dispatch")) {
+                if (node.get("property").asText().contains("damage")) {
+                    int maxDamage = getMaxDurability("minecraft:" +itemType);
+                    int scale = node.get("scale").asInt();
+                    int increment = maxDamage/scale;
+
+                    if(node.get("entries").isArray())
+                    {
+                        for (JsonNode entry : node.get("entries"))
+                        {
+                            foundItems.add(new TexturesPlusItem(enchants, firstWhen, increment * entry.get("threshold").asInt(), itemType, entry.get("model").asText()));
+                        }
+                    }
+
+                }
+            }
+            if (node.has("cases")) {
+                JsonNode cases = node.get("cases");
+                boolean isGui = node.get("property").asText().contains("display_context");
+                boolean isDamage = node.has("component") && node.get("component").asText().contains("damage");
+                if (node.get("cases").isArray()) {
+                    for (JsonNode caseNode : cases) {
+                        int damageNode = 0;
+                        if(isDamage)
+                        {
+                            JsonNode whenNode = caseNode.get("when");
+                            if(whenNode.isArray())
+                            {
+                                damageNode = whenNode.get(0).asInt();
+                            }
+                            else
+                            {
+                                damageNode = whenNode.asInt();
+                            }
+                        }
+                        if(isGui)
+                        {
+                            foundItems.add(getConditionsRecur(enchants, caseNode.get("model"), itemType, firstWhen, damageNode).getFirst());
+
+                        }
+                        else
+                        {
+                            foundItems.addAll(getConditionsRecur(enchants, caseNode.get("model"), itemType, firstWhen, damageNode));
+                        }
+                    }
+                }
+            }
+            if(foundItems.isEmpty())
+            {
+                LOGGER.error("Failed to find model in item " + firstWhen);
+            }
+            return foundItems;
         } catch (Exception e) {
-            LOGGER.error("Failed to parse item", e);
-            return null;
+            LOGGER.error("Failed to fully parse item", e);
+            return foundItems;
         }
 
+    }
+    public static int getMaxDurability(String itemId) {
+        Item item = Registries.ITEM.get(Identifier.of(itemId));
+        return new ItemStack(item).getMaxDamage();
     }
 
     static String getSpecialBlock(String itemName, String block)
@@ -498,7 +569,7 @@ public class TexturesPlusDatapackGenerator {
     }
     static String generateEnchantedWeaponCommand(int x, int y, int z, String rename, String block, String direction, int damage, String enchant, String item, String specialBlock)
     {
-        return "function texturesplus:weapons/place1weaponenchant" + direction + " {item:\""+ item + "\",x: \"" + x + "\", y: \"" + y + "\", z: \"" + z + "\",rename: \"" + rename + "\",block: \"" + block+"\",special_block:\""+specialBlock + "\",damage:"+ damage +",enchantment:\""+enchant+"\"}";
+        return "function texturesplus:weapons/place1weaponenchant" + direction + " {item:\""+ item + "\",x: \"" + x + "\", y: \"" + y + "\", z: \"" + z + "\",rename: \"" + rename + "\",block: \"" + block+"\",special_block:\""+specialBlock + "\",damage:"+ damage +",enchantment:\""+enchant.replace("minecraft:","")+"\"}";
     }
 
     static String generateCommand(int x, int y, int z, String rename, String block, String direction, String command)

@@ -7,7 +7,9 @@
   ],
   "client": [
     "ResourcePackEntryMixin",
-    "ResourcePackScreenMixin"
+    "ResourcePackScreenMixin",
+    "SelectWorldScreenMixin"
+
   ],
   "injectors": {
     "defaultRequire": 1

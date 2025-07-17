@@ -2,16 +2,22 @@ package com.dbrighthd.texturesplusmod;
 
 import net.minecraft.client.MinecraftClient;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.NbtLong;
+import net.minecraft.nbt.NbtSizeTracker;
 import org.apache.commons.io.FileUtils;
 
 import java.nio.file.StandardCopyOption;
+import java.time.Instant;
 import java.util.Collections;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -19,6 +25,7 @@ import static com.mojang.text2speech.Narrator.LOGGER;
 
 public class TexturesPlusWorldGenerator {
     public static void generateWorld() throws IOException {
+        LOGGER.info("Generating Textures+ test world...");
         File worldDir = Paths.get(MinecraftClient.getInstance().runDirectory.getPath(), "saves", "TexturesPlusGenerated").toFile();
         if (worldDir.exists()) {
             FileUtils.deleteDirectory(worldDir);
@@ -30,9 +37,28 @@ public class TexturesPlusWorldGenerator {
             }
             Files.copy(in, tempZip, StandardCopyOption.REPLACE_EXISTING);
             unzipWorldFileToSaves(tempZip, "TexturesPlusGenerated");  // unzip into the saves directory
+
+            Path levelDat = worldDir.toPath().resolve("level.dat");
+            if (Files.exists(levelDat)) {
+                try {
+                    NbtCompound root = NbtIo.readCompressed(levelDat, NbtSizeTracker.ofUnlimitedBytes());
+                    NbtCompound data = root.getCompound("Data").orElseGet(() -> {
+                        NbtCompound created = new NbtCompound();
+                        root.put("Data", created);
+                        return created;
+                    });
+                    data.put("LastPlayed", NbtLong.of(System.currentTimeMillis()));
+                    NbtIo.writeCompressed(root, levelDat);
+                    LOGGER.info("Set LastPlayed in level.dat to {}", Instant.ofEpochMilli(System.currentTimeMillis()));
+                } catch (IOException e) {
+                    LOGGER.error("Failed to bump LastPlayed", e);
+                }
+            }
             TexturesPlusDatapackGenerator.generatePumpkinsMcfunction();
             TexturesPlusDatapackGenerator.generateElytrasMcfunction();
             TexturesPlusDatapackGenerator.generateWeaponsMcfunction();
+
+            LOGGER.info("Finished Generating World!");
         }
 
 
