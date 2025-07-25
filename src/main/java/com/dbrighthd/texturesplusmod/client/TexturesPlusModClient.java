@@ -42,6 +42,8 @@ public class TexturesPlusModClient implements ClientModInitializer {
                 TexturesPlusWorldGenerator.generateWorld();
             } catch (IOException e) {
                 throw new RuntimeException(e);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
         }
 

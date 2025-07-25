@@ -92,13 +92,14 @@ public abstract class SelectWorldScreenMixin extends Screen {
     @Unique
     private void onPressed(TexturedButtonWidget button) {
         button.setFocused(false);
-        button.active = false;            // grey-out + start spinner
+        button.active = false; // grey-out and show spinner
 
-
-            try { TexturesPlusWorldGenerator.generateWorld();
+        TexturesPlusWorldGenerator.generateWorldAsync().thenRun(() -> {
+            // Must go back to main thread before touching UI
+            MinecraftClient.getInstance().execute(() -> {
                 button.active = true;
-                MinecraftClient client = MinecraftClient.getInstance();
-                client.execute(() -> client.setScreen(new SelectWorldScreen(this)));}
-            catch (Exception e) { throw new RuntimeException(e); }
+                MinecraftClient.getInstance().setScreen(new SelectWorldScreen(this));
+            });
+        });
     }
 }

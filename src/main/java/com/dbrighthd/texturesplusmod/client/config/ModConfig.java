@@ -17,6 +17,12 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip(count = 1)
     public boolean elytraArmorStands = false;
 
+    @ConfigEntry.Gui.Tooltip(count = 1)
+    public boolean mergeEntities = true;
+
+    @ConfigEntry.Gui.Tooltip(count = 1)
+    public boolean sortAlphabetically = true;
+
     @ConfigEntry.Gui.Tooltip(count = 3)
     public boolean devMode = false;
 }

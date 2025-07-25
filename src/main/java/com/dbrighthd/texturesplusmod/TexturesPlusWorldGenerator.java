@@ -16,6 +16,7 @@ import org.apache.commons.io.FileUtils;
 import java.nio.file.StandardCopyOption;
 import java.time.Instant;
 import java.util.Collections;
+import java.util.concurrent.CompletableFuture;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
@@ -24,7 +25,18 @@ import java.util.zip.ZipFile;
 import static com.mojang.text2speech.Narrator.LOGGER;
 
 public class TexturesPlusWorldGenerator {
-    public static void generateWorld() throws IOException {
+
+    public static CompletableFuture<Void> generateWorldAsync() {
+        return CompletableFuture.runAsync(() -> {
+            try {
+                generateWorld();
+            } catch (IOException | InterruptedException e) {
+                LOGGER.error("Failed to generate world", e);
+            }
+        });
+    }
+
+    public static void generateWorld() throws IOException, InterruptedException {
         LOGGER.info("Generating Textures+ test world...");
         File worldDir = Paths.get(MinecraftClient.getInstance().runDirectory.getPath(), "saves", "TexturesPlusGenerated").toFile();
         if (worldDir.exists()) {
@@ -57,7 +69,7 @@ public class TexturesPlusWorldGenerator {
             TexturesPlusDatapackGenerator.generatePumpkinsMcfunction();
             TexturesPlusDatapackGenerator.generateElytrasMcfunction();
             TexturesPlusDatapackGenerator.generateWeaponsMcfunction();
-
+            TexturesPlusDatapackGenerator.generateCreaturesMcfunction();
             LOGGER.info("Finished Generating World!");
         }
 

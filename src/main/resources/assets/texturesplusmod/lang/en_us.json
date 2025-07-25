@@ -6,9 +6,17 @@
   "text.autoconfig.texturesplusmod.option.async.@Tooltip[2]": "creates issues with resourcepacks disabling themselves",
   "text.autoconfig.texturesplusmod.option.async.@Tooltip[3]": "on launch",
   "text.autoconfig.texturesplusmod.option.updatePacksOnStartup": "Update Packs On Startup",
-  "text.autoconfig.texturesplusmod.option.makeWorld": "Generate T+ Test World",
-  "text.autoconfig.texturesplusmod.option.makeWorld.@Tooltip": "[BETA] Generates world ON EVERY STARTUP and when plus button is clicked",
-  "text.autoconfig.texturesplusmod.option.devMode": "Developer Mode for World",
+  "text.autoconfig.texturesplusmod.option.makeWorld": "Generate T+ World On Startup",
+  "text.autoconfig.texturesplusmod.option.makeWorld.@Tooltip": "Generates world ON EVERY STARTUP",
+
+  "text.autoconfig.texturesplusmod.option.mergeEntities": "Simplify Entities",
+  "text.autoconfig.texturesplusmod.option.mergeEntities.@Tooltip": "Hide some variants of entities (Angry dogs/bees)",
+
+
+  "text.autoconfig.texturesplusmod.option.sortAlphabetically": "Sort Entities Alphabetically",
+  "text.autoconfig.texturesplusmod.option.sortAlphabetically.@Tooltip": "If false, sorts by number of entities",
+
+  "text.autoconfig.texturesplusmod.option.devMode": "Dev Mode for World",
   "text.autoconfig.texturesplusmod.option.devMode.@Tooltip[0]": "DO NOT ENABLE IF YOU DO NOT KNOW WHAT THIS MEANS.",
   "text.autoconfig.texturesplusmod.option.devMode.@Tooltip[1]": "Generates world from local cloned repository in resourcepack folder",
   "text.autoconfig.texturesplusmod.option.devMode.@Tooltip[2]": "instead of the one downloaded from the mod.",
