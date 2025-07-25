@@ -670,7 +670,9 @@ public class TexturesPlusDatapackGenerator {
             entityType = "llama_" + entityType;
         }
         renamesList.removeIf(s -> s.equalsIgnoreCase("default"));
-
+        renamesList.removeIf(s -> s.contains("Slenderman"));
+        renamesList.removeIf(s -> s.contains("optijank"));
+        renamesList.removeIf(s -> s.contains("hidden_rename"));
 
         return createEntityFromProp(entityType, renamesList, cemTexturePaths, propFile);
     }
