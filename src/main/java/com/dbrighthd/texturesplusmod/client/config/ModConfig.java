@@ -12,9 +12,6 @@ public class ModConfig implements ConfigData {
     public boolean updatePacksOnStartup = true;
 
     @ConfigEntry.Gui.Tooltip(count = 1)
-    public boolean makeWorld = false;
-
-    @ConfigEntry.Gui.Tooltip(count = 1)
     public boolean elytraArmorStands = false;
 
     @ConfigEntry.Gui.Tooltip(count = 1)

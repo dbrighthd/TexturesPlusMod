@@ -430,7 +430,11 @@ public class TexturesPlusDatapackGenerator {
             westEastEntities = splitInHalfMiddle(entities);
         }
 
-        List<TexturesPlusEntity> westEntities = westEastEntities.get(0).reversed();
+        List<TexturesPlusEntity> westEntities = westEastEntities.get(0);
+        if(TexturesPlusModClient.getConfig().sortAlphabetically)
+        {
+            westEntities = westEntities.reversed();
+        }
         List<TexturesPlusEntity> eastEntities = westEastEntities.get(1);
 
         StringBuilder sb = new StringBuilder();
@@ -704,6 +708,12 @@ public class TexturesPlusDatapackGenerator {
             String variant = propName.replace("_cow", "");
             nbtString = formatNbt("variant", variant, nbtSlash);
             rawNbtString = formatNbt("variant", variant, rawNbtSlash);
+
+        }
+        if (propName.equals("snow_fox")) {
+            entityType = "fox";
+            nbtString = formatNbt("Type", "snow", nbtSlash);
+            rawNbtString = formatNbt("Type", "snow", rawNbtSlash);
 
         }
         if (propName.endsWith("panda")) {

@@ -66,10 +66,31 @@ public class TexturesPlusWorldGenerator {
                     LOGGER.error("Failed to bump LastPlayed", e);
                 }
             }
-            TexturesPlusDatapackGenerator.generatePumpkinsMcfunction();
-            TexturesPlusDatapackGenerator.generateElytrasMcfunction();
-            TexturesPlusDatapackGenerator.generateWeaponsMcfunction();
-            TexturesPlusDatapackGenerator.generateCreaturesMcfunction();
+            try{
+                TexturesPlusDatapackGenerator.generatePumpkinsMcfunction();
+            }
+            catch (Exception e) {
+                LOGGER.error("Failed to generate Pumpkins+ section in : ", e);
+            }
+            try{
+                TexturesPlusDatapackGenerator.generateElytrasMcfunction();
+            }
+            catch (Exception e) {
+                LOGGER.error("Failed to generate Elytras+ section in world: ", e);
+            }
+            try{
+                TexturesPlusDatapackGenerator.generateWeaponsMcfunction();
+            }
+            catch (Exception e) {
+                LOGGER.error("Failed to generate Weapons+ section in world: ", e);
+            }
+            try{
+                TexturesPlusDatapackGenerator.generateCreaturesMcfunction();
+            }
+            catch (Exception e) {
+                LOGGER.error("Failed to generate Creatures+ section in world: ", e);
+            }
+
             LOGGER.info("Finished Generating World!");
         }
 

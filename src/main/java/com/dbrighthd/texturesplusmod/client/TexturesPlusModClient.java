@@ -36,16 +36,6 @@ public class TexturesPlusModClient implements ClientModInitializer {
             });
             LOGGER.info("Finished fetching textures+ packs!");
         }
-        if(getConfig().makeWorld)
-        {
-            try {
-                TexturesPlusWorldGenerator.generateWorld();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (RenderSystem.isOnRenderThread()) {
