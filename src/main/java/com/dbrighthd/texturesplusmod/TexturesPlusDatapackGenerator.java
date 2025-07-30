@@ -635,7 +635,7 @@ public class TexturesPlusDatapackGenerator {
             return null;
         }
 
-        Set<String> renamesSet = new HashSet<>();
+        Set<String> renamesSet = new LinkedHashSet<>();
 
         try (BufferedReader reader = Files.newBufferedReader(propFile, StandardCharsets.UTF_8)) {
             reader.lines()
