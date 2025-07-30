@@ -17,6 +17,7 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.mojang.text2speech.Narrator.LOGGER;
@@ -371,6 +372,39 @@ public class TexturesPlusDatapackGenerator {
 
         Files.writeString(functionPath, sb.toString(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
     }
+    public static List<List<TexturesPlusItem>> groupByItemSuffix(List<TexturesPlusItem> items) {
+        List<String> materials = List.of("WOODEN", "STONE", "GOLDEN", "IRON", "DIAMOND", "NETHERITE");
+
+        Map<String, List<TexturesPlusItem>> grouped = new LinkedHashMap<>();
+        List<TexturesPlusItem> misc = new ArrayList<>();
+
+        for (TexturesPlusItem item : items) {
+            String typeUpper = item.rename.toUpperCase();
+            boolean matched = false;
+
+            for (String mat : materials) {
+                if (typeUpper.startsWith(mat)) {
+                    String suffix = item.rename.substring(mat.length()).trim().toLowerCase();
+                    grouped.computeIfAbsent(suffix, k -> new ArrayList<>()).add(item);
+                    matched = true;
+                    break;
+                }
+            }
+
+            if (!matched) {
+                misc.add(item);
+            }
+        }
+
+        // Prepare final grouped list
+        List<List<TexturesPlusItem>> result = new ArrayList<>(grouped.values());
+        if (!misc.isEmpty()) {
+            result.add(misc); // Add misc group at the end
+        }
+
+        return result;
+    }
+
 
     public static void generateCreaturesMcfunction() throws IOException {
         LOGGER.info("Generating Creatures+ placement in world...");
@@ -905,6 +939,29 @@ public class TexturesPlusDatapackGenerator {
     }
     static void createWeaponRow(StringBuilder sb, List<TexturesPlusItem> items, int x, int y, int z, String block, String direction)
     {
+        x--;
+        List<List<TexturesPlusItem>> sections = groupByItemSuffix(items);
+        for(List<TexturesPlusItem> section : sections)
+        {
+            if(section.size() > 9 || section.size() == 1)
+            {
+                x = continueSimpleeaponRow(sb,section, x, y, z, block, direction);
+            }
+            else
+            {
+                sb.append("function texturesplus:weapons/placemultweapons" + direction + "start {block:\"" + block + "\", x:" + x + ",y:" + y + ",z:" + z + "}\n");
+                int num = 0;
+                for(TexturesPlusItem item : section)
+                {
+                    sb.append(generateWeaponMultCommand(x,y,z,item.rename,block,direction,item.damage, item.itemType,getSpecialBlock(item.itemType, block), num)).append("\n");
+                    num++;
+                }
+                x-=1;
+            }
+        }
+    }
+    static int continueSimpleeaponRow(StringBuilder sb, List<TexturesPlusItem> items, int x, int y, int z, String block, String direction)
+    {
         for (TexturesPlusItem item : items)
         {
             if(item.enchantments.isEmpty())
@@ -917,6 +974,7 @@ public class TexturesPlusDatapackGenerator {
             }
             x -=1;
         }
+        return x;
     }
     public static String getFirstRegexMatch(String pattern) {
         // Strip known prefixes
@@ -1160,7 +1218,11 @@ public class TexturesPlusDatapackGenerator {
     {
         return "function texturesplus:weapons/place1weaponenchant" + direction + " {item:\""+ item + "\",x: \"" + x + "\", y: \"" + y + "\", z: \"" + z + "\",rename: \"" + rename + "\",block: \"" + block+"\",special_block:\""+specialBlock + "\",damage:"+ damage +",enchantment:\""+enchant.replace("minecraft:","")+"\"}";
     }
+    static String generateWeaponMultCommand(int x, int y, int z, String rename, String block, String direction, int damage, String item, String specialBlock, int num)
+    {
+        return "function texturesplus:weapons/placemultweapons" + direction + "num {item:\""+ item + "\",x: \"" + x + "\", y: \"" + y + "\", z: \"" + z + "\",num: " + num + ",rename: \"" + rename + "\",block: \"" + block +"\",special_block:\""+specialBlock + "\",damage:"+ damage +"}";
 
+    }
     static String generateCommand(int x, int y, int z, String rename, String block, String direction, String command)
     {
         return "function texturesplus:place" + command + direction + " {x: \"" + x + "\", y: \"" + y + "\", z: \"" + z + "\",rename: \"" + rename + "\",block: \"" + block + "\"}";
