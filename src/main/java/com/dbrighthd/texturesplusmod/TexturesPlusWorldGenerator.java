@@ -1,5 +1,6 @@
 package com.dbrighthd.texturesplusmod;
 
+import com.dbrighthd.texturesplusmod.datapackutil.*;
 import net.minecraft.client.MinecraftClient;
 
 import java.io.*;
@@ -17,8 +18,6 @@ import java.nio.file.StandardCopyOption;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -67,25 +66,25 @@ public class TexturesPlusWorldGenerator {
                 }
             }
             try{
-                TexturesPlusDatapackGenerator.generatePumpkinsMcfunction();
+                PumpkinsPlusDatapackGenerator.generatePumpkinsMcfunction();
             }
             catch (Exception e) {
                 LOGGER.error("Failed to generate Pumpkins+ section in : ", e);
             }
             try{
-                TexturesPlusDatapackGenerator.generateElytrasMcfunction();
+                ElytrasPlusDatapackGenerator.generateElytrasMcfunction();
             }
             catch (Exception e) {
                 LOGGER.error("Failed to generate Elytras+ section in world: ", e);
             }
             try{
-                TexturesPlusDatapackGenerator.generateWeaponsMcfunction();
+                WeaponsPlusDatapackGenerator.generateWeaponsMcfunction();
             }
             catch (Exception e) {
                 LOGGER.error("Failed to generate Weapons+ section in world: ", e);
             }
             try{
-                TexturesPlusDatapackGenerator.generateCreaturesMcfunction();
+                CreaturesPlusDatapackGenerator.generateCreaturesMcfunction();
             }
             catch (Exception e) {
                 LOGGER.error("Failed to generate Creatures+ section in world: ", e);
