@@ -1065,7 +1065,7 @@ public class TexturesPlusDatapackGenerator {
                     {
                         for (JsonNode entry : node.get("entries"))
                         {
-                            foundItems.add(new TexturesPlusItem(enchants, firstWhen, increment * entry.get("threshold").asInt(), itemType, entry.get("model").asText()));
+                            foundItems.add(new TexturesPlusItem(enchants, firstWhen, increment * entry.get("threshold").asInt()+1, itemType, entry.get("model").asText()));
                         }
                     }
                 }
