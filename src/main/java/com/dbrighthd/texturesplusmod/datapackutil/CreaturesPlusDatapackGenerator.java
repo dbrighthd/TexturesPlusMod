@@ -3,6 +3,7 @@ package com.dbrighthd.texturesplusmod.datapackutil;
 import com.dbrighthd.texturesplusmod.client.TexturesPlusModClient;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import net.fabricmc.fabric.impl.resource.loader.ModResourcePackUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
@@ -22,13 +23,18 @@ import static com.mojang.text2speech.Narrator.LOGGER;
 
 public class CreaturesPlusDatapackGenerator {
     public static Set<String> parsedEntities;
-    public static final List<String> DISALLOWED_ENTITIES_BEFORE_PARSE = List.of("respackopts","overlay", "_charging", "_shooting", "equipment","armor","rope","harness","saddle","spark","evoker_fangs","profession","collar");
-    public static final List<String> DISALLOWED_ENTITIES_AFTER_PARSE = List.of("armadillo_scute","harness","emerald","stone","gold","diamond","horse_markings","spider_eyes","fox_sleep","iron_golem_crackiness","sheep_wool","enderman_eyes","boat","saddle","baby");
-    public static final Map<String, Integer> ENTITY_INCREMENTS = Map.of(
-            "ghast", 11,
-            "camel", 4,
-            "sniffer", 4
-    );
+    public static List<String> disallowedEntitiesBeforeParse;
+    public static List<String> disallowedEntitiesAfterParse;
+    public static Map<String, Integer> entityIncrements;
+
+    private static List<String> loadListFromFile(Path filename) {
+        try {
+            return Files.readAllLines(filename);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
     public static void generateCreaturesMcfunction() throws IOException {
         LOGGER.info("Generating Creatures+ placement in world...");
         // Path to your JSON file
@@ -36,6 +42,9 @@ public class CreaturesPlusDatapackGenerator {
         if (TexturesPlusModClient.getConfig().devMode) {
             creaturesPath = "creatures";
         }
+        disallowedEntitiesBeforeParse = getDisallowedEntitiesBeforeParse();
+        disallowedEntitiesAfterParse = getDisallowedEntitiesAfterParse();
+        entityIncrements = getEntityIncrements();
         parsedEntities = new HashSet<>();
         List<Path> propertyFiles = new ArrayList<>();
         Path creaturesDir = Paths.get(MinecraftClient.getInstance().runDirectory.getPath(), "resourcepacks", creaturesPath, "assets", "minecraft", "optifine", "random", "entity");
@@ -237,7 +246,7 @@ public class CreaturesPlusDatapackGenerator {
     public static void createCreatureRow(StringBuilder sb, TexturesPlusEntity entity, int x, int y, int z, String block)
     {
         int increment = 3;
-        for (Map.Entry<String, Integer> entry : ENTITY_INCREMENTS.entrySet()) {
+        for (Map.Entry<String, Integer> entry : entityIncrements.entrySet()) {
             if (entity.entityType.contains(entry.getKey())) {
                 increment = entry.getValue();
                 break;
@@ -258,7 +267,7 @@ public class CreaturesPlusDatapackGenerator {
                 "resourcepacks");
         Path relative = resourceDir.relativize(propFile.toAbsolutePath().normalize());
         String cleanPath = relative.toString().replace(".properties", "");
-        if(DISALLOWED_ENTITIES_BEFORE_PARSE.stream().anyMatch(cleanPath::contains))
+        if(disallowedEntitiesBeforeParse.stream().anyMatch(cleanPath::contains))
         {
             return null;
         }
@@ -325,7 +334,7 @@ public class CreaturesPlusDatapackGenerator {
             if (entityType.contains("baby") || entityType.contains("saddle") || entityType.contains("boat")) return null;
         }
 
-        if (DISALLOWED_ENTITIES_AFTER_PARSE.stream().anyMatch(propName::contains) && !propName.contains("axolotl")) {
+        if (disallowedEntitiesAfterParse.stream().anyMatch(propName::contains) && !propName.contains("axolotl")) {
             return null;
         }
 
@@ -530,5 +539,63 @@ public class CreaturesPlusDatapackGenerator {
         if (id == null) return false;
 
         return Registries.ENTITY_TYPE.containsId(id);
+    }
+    public static List<String> getDisallowedEntitiesBeforeParse() {
+        String creaturesPath = "creaturesplus";
+        if (TexturesPlusModClient.getConfig().devMode) {
+            creaturesPath = "creatures";
+        }
+        List<String> output = new ArrayList<>();
+        try {
+            Path txtFile = Paths.get(MinecraftClient.getInstance().runDirectory.getPath(), "resourcepacks", creaturesPath, "assets", "creatures","disallowed_entities_before_parse.txt");
+            output = loadListFromFile(txtFile);
+        } catch (Exception e) {
+            System.err.println("Could not read entity_increments.txt: " + e.getMessage());
+        }
+        return output;
+    }
+
+    public static List<String> getDisallowedEntitiesAfterParse() {
+        String creaturesPath = "creaturesplus";
+        if (TexturesPlusModClient.getConfig().devMode) {
+            creaturesPath = "creatures";
+        }
+        List<String> output = new ArrayList<>();
+        try {
+            Path txtFile = Paths.get(MinecraftClient.getInstance().runDirectory.getPath(), "resourcepacks", creaturesPath, "assets", "creatures","disallowed_entities_after_parse.txt");
+            output = loadListFromFile(txtFile);
+        } catch (Exception e) {
+            System.err.println("Could not read entity_increments.txt: " + e.getMessage());
+        }
+        return output;
+    }
+
+    public static Map<String, Integer> getEntityIncrements() {
+        String creaturesPath = "creaturesplus";
+        if (TexturesPlusModClient.getConfig().devMode) {
+            creaturesPath = "creatures";
+        }
+        Path txtFile = Paths.get(MinecraftClient.getInstance().runDirectory.getPath(), "resourcepacks", creaturesPath, "assets", "creatures","entity_increments.txt");
+
+        Map<String, Integer> map = new HashMap<>();
+        try (Stream<String> lines = Files.lines(txtFile)) {
+            lines.map(String::trim)
+                    .filter(line -> !line.isEmpty() && line.contains(","))
+                    .forEach(line -> {
+                        String[] parts = line.split(",", 2);
+                        if (parts.length == 2) {
+                            String key = parts[0].trim();
+                            try {
+                                int value = Integer.parseInt(parts[1].trim());
+                                map.put(key, value);
+                            } catch (NumberFormatException e) {
+                                System.err.println("Invalid number for key: " + key);
+                            }
+                        }
+                    });
+        } catch (IOException e) {
+            System.err.println("Could not read entity_increments.txt: " + e.getMessage());
+        }
+        return map;
     }
 }
