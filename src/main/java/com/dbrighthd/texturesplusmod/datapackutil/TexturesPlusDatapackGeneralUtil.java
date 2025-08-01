@@ -46,51 +46,61 @@ public class TexturesPlusDatapackGeneralUtil {
 
 
     public static String getFirstRegexMatch(String pattern) {
-        // Strip known prefixes
-        if (pattern.startsWith("regex:") || pattern.startsWith("iregex:")) {
-            pattern = pattern.substring(pattern.indexOf(':') + 1)
-                    .replace(".*","")
-                    .replace(".","");
-        } else if (pattern.startsWith("pattern:") || pattern.startsWith("ipattern:")) {
-            pattern = pattern.substring(pattern.indexOf(':') + 1)
-                    .replace("*", "")
-                    .replace("?", "");
-        } else {
-            return pattern;
+
+        String lower = pattern.toLowerCase(Locale.ROOT);
+        if (lower.startsWith("regex:")    || lower.startsWith("iregex:")
+                || lower.startsWith("pattern:")  || lower.startsWith("ipattern:")) {
+            pattern = pattern.substring(pattern.indexOf(':') + 1);
         }
 
-        // Remove leading/trailing wildcards, but keep structure
-        pattern = pattern.replaceAll("^\\.*", "").replaceAll("\\.*$", "");
+        String raw = firstBranch(pattern.trim(), 0, pattern.length());
 
-        StringBuilder result = new StringBuilder();
-        int i = 0;
-        while (i < pattern.length()) {
-            char c = pattern.charAt(i);
+        return raw.replaceAll("\\\\([.\\[*+?()|{}^$\\\\])", "$1") // un-escape literals like "\."
+                .trim();
+    }
+
+    /*More in depth regex checking*/
+    private static String firstBranch(String s, int lo, int hi) {
+        StringBuilder out = new StringBuilder();
+        int i = lo;
+
+        while (i < hi) {
+            char c = s.charAt(i);
+            if (c == '|') break;
             if (c == '(') {
-                int depth = 1;
-                int start = i + 1;
-                int end = start;
-                while (end < pattern.length() && depth > 0) {
-                    if (pattern.charAt(end) == '(') depth++;
-                    else if (pattern.charAt(end) == ')') depth--;
-                    end++;
+                int depth = 1, j = i + 1;
+                while (j < hi && depth > 0) {
+                    char cj = s.charAt(j);
+                    if (cj == '(') depth++;
+                    else if (cj == ')') depth--;
+                    j++;
                 }
                 if (depth == 0) {
-                    String group = pattern.substring(start, end - 1);
-                    String[] options = group.split("\\|");
-                    result.append(options[0].trim());  // take first option
-                    i = end;
+
+                    out.append(firstBranch(s, i + 1, j - 1));
+                    i = j;
                     continue;
                 } else {
-                    break;  // unbalanced
+                    break;
                 }
-            } else if (c != '.' && c != '*') {
-                result.append(c);
             }
+
+            if (c == '.' || c == '*' || c == '?' || c == '+'
+                    || c == '^' || c == '$') {
+                i++;
+                continue;
+            }
+
+            if (c == '\\' && i + 1 < hi) {
+                out.append(s.charAt(i + 1));
+                i += 2;
+                continue;
+            }
+
+            out.append(c);
             i++;
         }
-
-        return result.toString();
+        return out.toString();
     }
     public static void generateMapEntry(Map<String,List<TexturesPlusItem>> itemMap, Path jsonFile)
     {
