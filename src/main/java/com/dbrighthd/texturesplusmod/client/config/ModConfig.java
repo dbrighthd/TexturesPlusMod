@@ -20,6 +20,8 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip(count = 1)
     public boolean sortAlphabetically = true;
 
+    public boolean ignoreTexturesPlusMcmeta = true;
+
     @ConfigEntry.Gui.Tooltip(count = 3)
     public boolean devMode = false;
 }

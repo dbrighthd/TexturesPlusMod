@@ -22,6 +22,7 @@
   "text.autoconfig.texturesplusmod.option.elytraArmorStands": "Elytra Armor Stands for World",
   "text.autoconfig.texturesplusmod.option.elytraArmorStands.@Tooltip": "Generate armor stand with every elytra in the generated world (LAGGY)",
 
+  "text.autoconfig.texturesplusmod.option.ignoreTexturesPlusMcmeta": "Ignore Textures+ Mcmeta Version",
   "texturesplusmod.reload": "Reload",
   "texturesplusmod.reload.text": "A Resource Pack reload is required to apply the newly-downloaded Textures+ packs, reload now?"
 }
