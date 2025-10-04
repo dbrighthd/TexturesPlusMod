@@ -28,6 +28,7 @@ atlassian-ide-plugin.xml
 *.nar
 *.ear
 *.zip
+!template_world.zip
 *.tar.gz
 *.rar
 
