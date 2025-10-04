@@ -1,10 +1,8 @@
 package com.dbrighthd.texturesplusmod.mixin;
 
 import com.dbrighthd.texturesplusmod.PackGetterUtil;
-import com.dbrighthd.texturesplusmod.TexturesPlusWorldGenerator;
 import com.dbrighthd.texturesplusmod.client.TexturesPlusModClient;
 import com.dbrighthd.texturesplusmod.client.screen.ReloadPrompt;
-import me.shedaniel.autoconfig.AutoConfig;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
@@ -23,8 +21,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Shadow;
-import com.dbrighthd.texturesplusmod.client.config.ModConfig;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 
@@ -51,15 +47,15 @@ public abstract class ResourcePackScreenMixin extends Screen {
         super(title);
     }
 
-    @Inject(at = @At("RETURN"), method = "refreshWidgetPositions")
-    private void refreshWidgetPositions(CallbackInfo ci) {
+    @Inject(method = "refreshWidgetPositions", at = @At("RETURN"))
+    private void textures$refreshWidgetPositions(CallbackInfo ci) {
         if (this.tButton != null) {
             tButton.setPosition(22, (this.height - 40));
         }
     }
 
-    @Inject(at = @At("RETURN"), method = "init")
-    private void addTexturesButton(CallbackInfo ci)
+    @Inject(method = "init", at = @At("RETURN"))
+    private void textures$addTexturesButton(CallbackInfo ci)
     {
         assert this.client != null;
         if (this.file.equals(this.client.getResourcePackDir())) {

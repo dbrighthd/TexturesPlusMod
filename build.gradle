@@ -32,7 +32,7 @@ dependencies {
     modImplementation include ('com.fasterxml.jackson.core:jackson-annotations:2.13.3')
     modImplementation include ('com.fasterxml.jackson.core:jackson-core:2.13.3')
 
-    modApi("me.shedaniel.cloth:cloth-config-fabric:17.0.144") {
+    modApi("me.shedaniel.cloth:cloth-config-fabric:20.0.148") {
         exclude(group: "net.fabricmc.fabric-api")
     }
 }
@@ -70,7 +70,7 @@ java {
 }
 
 jar {
-    archiveBaseName = archives_base_name
+    inputs.property "archivesName", archives_base_name
     from("LICENSE") {
         rename { "${it}_${archives_base_name}" }
     }
