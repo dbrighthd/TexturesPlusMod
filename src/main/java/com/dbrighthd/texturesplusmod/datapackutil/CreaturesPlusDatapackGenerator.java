@@ -298,6 +298,10 @@ public class CreaturesPlusDatapackGenerator {
         {
             entityType = "rabbit_" + entityType;
         }
+        else if(propFile.toString().contains("ocelot"))
+        {
+            entityType = "ocelot";
+        }
         else if(propFile.toString().contains("cat"))
         {
             entityType = "cat_" + entityType;
