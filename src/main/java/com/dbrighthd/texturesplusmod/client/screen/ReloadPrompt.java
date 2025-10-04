@@ -6,8 +6,10 @@ import net.minecraft.client.font.MultilineText;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
@@ -52,7 +54,7 @@ public class ReloadPrompt extends Screen {
     protected void init() {
         super.init();
         this.messageSplit = MultilineText.create(this.textRenderer, MESSAGE, this.width - 50);
-        int i = MathHelper.clamp(this.getMessageY() + this.getMessagesHeight() + 20, this.height / 6 + 96, this.height - 24);
+        int i = MathHelper.clamp(90 + (this.messageSplit.getLineCount() * 9) + 12, this.height / 6 + 96, this.height - 24);
         this.buttons.clear();
         this.addButtons(i);
     }
@@ -69,8 +71,8 @@ public class ReloadPrompt extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, this.getTitleY(), 16777215);
-        this.messageSplit.drawCenterWithShadow(context, this.width / 2, this.getMessageY());
+        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 70, Colors.WHITE);
+        this.messageSplit.draw(context, MultilineText.Alignment.CENTER, this.width / 2, 90, 9, true, 0xFFFFFFFF);
     }
 
     private int getTitleY() {
@@ -83,7 +85,7 @@ public class ReloadPrompt extends Screen {
     }
 
     private int getMessagesHeight() {
-        return this.messageSplit.count() * 9;
+        return this.messageSplit.getLineCount() * 9;
     }
 
     public void disableButtons(int ticks) {
@@ -110,12 +112,12 @@ public class ReloadPrompt extends Screen {
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
+    public boolean keyPressed(KeyInput input) {
+        if (input.key() == GLFW.GLFW_KEY_ESCAPE) {
             this.onConfirm(false);
             return true;
         } else {
-            return super.keyPressed(keyCode, scanCode, modifiers);
+            return super.keyPressed(input);
         }
     }
 }
