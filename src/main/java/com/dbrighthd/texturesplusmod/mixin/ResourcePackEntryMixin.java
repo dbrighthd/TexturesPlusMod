@@ -1,5 +1,6 @@
 package com.dbrighthd.texturesplusmod.mixin;
 
+import com.dbrighthd.texturesplusmod.client.TexturesPlusModClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.pack.PackListWidget;
 import net.minecraft.client.gui.screen.pack.ResourcePackOrganizer;
@@ -23,7 +24,7 @@ public class ResourcePackEntryMixin {
 
     @Redirect(method = {"render", "enable"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/resource/ResourcePackCompatibility;isCompatible()Z"))
     public boolean redirectIsCompatible(ResourcePackCompatibility compatibility) {
-        return compatibility.isCompatible() || isTexturesPlusPack();
+        return compatibility.isCompatible() || (isTexturesPlusPack() && TexturesPlusModClient.getConfig().ignoreTexturesPlusMcmeta);
     }
 
     @Unique

@@ -5,7 +5,11 @@
   "name": "Textures Plus Mod",
   "description": "Updates all 4 Textures+ packs from their github repositories on startup.",
   "authors": [],
-  "contact": {},
+  "contact": {
+    "homepage": "https://modrinth.com/mod/textures-plus-mod",
+    "sources": "https://github.com/dbrighthd/TexturesPlusMod",
+    "issues": "https://github.com/dbrighthd/TexturesPlusMod/issues"
+  },
   "license": "MIT",
   "icon": "assets/texturesplusmod/icon.png",
   "environment": "*",
@@ -31,7 +35,7 @@
   "custom": {
     "modmenu": {
       "links": {
-        "modmenu.discord": "https://discord.com/WCvwtzW"
+        "modmenu.discord": "https://discord.com/invite/WCvwtzW"
       }
     }
   }

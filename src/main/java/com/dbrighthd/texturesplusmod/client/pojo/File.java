@@ -1,6 +1,12 @@
 package com.dbrighthd.texturesplusmod.client.pojo; 
 import com.fasterxml.jackson.annotation.JsonProperty; 
 public class File{
+    @JsonProperty("previous_filename")
+    public String getPreviousFilename() {
+        return this.previous_filename; }
+    public void setPreviousFilename(String previous_filename) {
+        this.previous_filename = previous_filename; }
+    String previous_filename;
     @JsonProperty("sha") 
     public String getSha() { 
 		 return this.sha; } 
