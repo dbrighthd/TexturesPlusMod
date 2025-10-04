@@ -18,7 +18,7 @@ public class ResourcePackEntryMixin {
     @Shadow @Final private ResourcePackOrganizer.Pack pack;
 
     @Inject(method = "render", at = @At("HEAD"))
-    public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta, CallbackInfo ci) {
+    public void render(DrawContext context, int mouseX, int mouseY, boolean hovered, float deltaTicks, CallbackInfo ci) {
     }
 
     @Redirect(method = {"render", "enable"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/resource/ResourcePackCompatibility;isCompatible()Z"))
