@@ -11,12 +11,11 @@ import net.minecraft.util.Identifier;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.mojang.text2speech.Narrator.LOGGER;
@@ -25,7 +24,11 @@ public class CreaturesPlusDatapackGenerator {
     public static Set<String> parsedEntities;
     public static List<String> disallowedEntitiesBeforeParse;
     public static List<String> disallowedEntitiesAfterParse;
+    public static Map<String, int[]> entityMachinePlacements;
     public static Map<String, Integer> entityIncrements;
+    public static Map<String, Integer> miscArgs;
+    public static Map<String, String> miscStringArgs;
+
 
     private static List<String> loadListFromFile(Path filename) {
         try {
@@ -35,6 +38,7 @@ public class CreaturesPlusDatapackGenerator {
             return Collections.emptyList();
         }
     }
+
     public static void generateCreaturesMcfunction() throws IOException {
         LOGGER.info("Generating Creatures+ placement in world...");
         // Path to your JSON file
@@ -42,9 +46,13 @@ public class CreaturesPlusDatapackGenerator {
         if (TexturesPlusModClient.getConfig().devMode) {
             creaturesPath = "creatures";
         }
+        entityMachinePlacements = getEntityMachineSize();
+        copyMachinesToData();
         disallowedEntitiesBeforeParse = getDisallowedEntitiesBeforeParse();
         disallowedEntitiesAfterParse = getDisallowedEntitiesAfterParse();
         entityIncrements = getEntityIncrements();
+        miscArgs = getMiscArgs();
+        miscStringArgs = getMiscStringArgs();
         parsedEntities = new HashSet<>();
         List<Path> propertyFiles = new ArrayList<>();
         Path creaturesDir = Paths.get(MinecraftClient.getInstance().runDirectory.getPath(), "resourcepacks", creaturesPath, "assets", "minecraft", "optifine", "random", "entity");
@@ -85,35 +93,31 @@ public class CreaturesPlusDatapackGenerator {
                 Comparator.comparingInt((TexturesPlusEntity e) -> e.nbtList.size())
                         .reversed();
         List<List<TexturesPlusEntity>> westEastEntities;
-        if (!TexturesPlusModClient.getConfig().sortAlphabetically)
-        {
+        if (!TexturesPlusModClient.getConfig().sortAlphabetically) {
             entities.sort(byNbtSize);
             westEastEntities = TexturesPlusDatapackGeneralUtil.splitInHalfAlternating(entities);
-        }
-        else
-        {
+        } else {
             entities.sort((a, b) -> a.entityType.compareToIgnoreCase(b.entityType));
             westEastEntities = TexturesPlusDatapackGeneralUtil.splitInHalfMiddle(entities);
         }
 
         List<TexturesPlusEntity> westEntities = westEastEntities.get(0);
-        if(TexturesPlusModClient.getConfig().sortAlphabetically)
-        {
+        if (TexturesPlusModClient.getConfig().sortAlphabetically) {
             westEntities = westEntities.reversed();
         }
         List<TexturesPlusEntity> eastEntities = westEastEntities.get(1);
 
         StringBuilder sb = new StringBuilder();
-        createWestCreatures(sb,westEntities);
-        createEastCreatures(sb,eastEntities);
-        Path functionPath = Paths.get(MinecraftClient.getInstance().runDirectory.getPath(), "saves", "TexturesPlusGenerated","datapacks","texturesplus","data","texturesplus","function","allcreatures.mcfunction");
-        Path functionPathBlocks = Paths.get(MinecraftClient.getInstance().runDirectory.getPath(), "saves", "TexturesPlusGenerated","datapacks","texturesplus","data","texturesplus","function","allcreaturesblocks.mcfunction");
-        Files.writeString(functionPathBlocks, sb.toString().replace("placeentity","placeblocks"), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        createCreatures(sb, westEntities, "west");
+        createCreatures(sb, eastEntities, "east");
+        Path functionPath = Paths.get(MinecraftClient.getInstance().runDirectory.getPath(), "saves", "TexturesPlusGenerated", "datapacks", "texturesplus", "data", "texturesplus", "function", "allcreatures.mcfunction");
+        Path functionPathBlocks = Paths.get(MinecraftClient.getInstance().runDirectory.getPath(), "saves", "TexturesPlusGenerated", "datapacks", "texturesplus", "data", "texturesplus", "function", "allcreaturesblocks.mcfunction");
+        Files.writeString(functionPathBlocks, sb.toString().replace("placeentity", "placeblocks"), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 
         Files.writeString(functionPath, sb.toString(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
     }
 
-    private static void processCemTexture(Path file, Map<String,String> cemMap) {
+    private static void processCemTexture(Path file, Map<String, String> cemMap) {
         try (Reader in = Files.newBufferedReader(file)) {
             JsonElement root = JsonParser.parseReader(in);
             findTextures(root, file.getFileName().toString(), cemMap);
@@ -122,15 +126,15 @@ public class CreaturesPlusDatapackGenerator {
             System.err.println("[TextureIndex] Couldn't read " + file + ": " + ex.getMessage());
         }
     }
-    private static void findTextures(JsonElement el, String fileName, Map<String,String> cemMap) {
+
+    private static void findTextures(JsonElement el, String fileName, Map<String, String> cemMap) {
         if (el.isJsonObject()) {
             for (Map.Entry<String, JsonElement> entry : el.getAsJsonObject().entrySet()) {
                 if ("texture".equals(entry.getKey())
                         && entry.getValue().isJsonPrimitive()
                         && entry.getValue().getAsJsonPrimitive().isString()) {
 
-                    if(!fileName.contains("baby") && !fileName.contains("saddle"))
-                    {
+                    if (!fileName.contains("baby") && !fileName.contains("saddle")) {
                         cemMap.put(entry.getValue().getAsString(), fileName);
                     }
 
@@ -144,114 +148,130 @@ public class CreaturesPlusDatapackGenerator {
             }
         }
     }
-    public static List<TexturesPlusEntity> mergeLikeEntities(List<TexturesPlusEntity> allEntities)
-    {
+
+    public static List<TexturesPlusEntity> mergeLikeEntities(List<TexturesPlusEntity> allEntities) {
         List<TexturesPlusEntity> mergedEntities = new ArrayList<>();
-        for (TexturesPlusEntity entity : allEntities)
-        {
-            int index = indexOfEntity(mergedEntities,entity);
-            if(index >= 0)
-            {
+        for (TexturesPlusEntity entity : allEntities) {
+            int index = indexOfEntity(mergedEntities, entity);
+            if (index >= 0) {
                 mergeEntityNoRepeat(mergedEntities.get(index), entity);
-            }
-            else
-            {
+            } else {
                 mergedEntities.add(entity);
             }
         }
         return mergedEntities;
     }
-    public static void mergeEntityNoRepeat(TexturesPlusEntity entityToMergeInto, TexturesPlusEntity entityToMergeFrom)
-    {
-        for (TexturesPlusEntityNbt entityNbt : entityToMergeFrom.nbtList)
-        {
+
+    public static void mergeEntityNoRepeat(TexturesPlusEntity entityToMergeInto, TexturesPlusEntity entityToMergeFrom) {
+        for (TexturesPlusEntityNbt entityNbt : entityToMergeFrom.nbtList) {
             boolean isRepeat = false;
-            for(TexturesPlusEntityNbt targetNbt : entityToMergeInto.nbtList)
-            {
-                if (entityNbt.rename.toLowerCase().equals(targetNbt.rename.toLowerCase()) && !targetNbt.rename.toLowerCase().equals("default"))
-                {
+            for (TexturesPlusEntityNbt targetNbt : entityToMergeInto.nbtList) {
+                if (entityNbt.rename.toLowerCase().equals(targetNbt.rename.toLowerCase()) && !targetNbt.rename.toLowerCase().equals("default")) {
                     isRepeat = true;
                     break;
                 }
             }
-            if(!isRepeat)
-            {
+            if (!isRepeat) {
                 entityToMergeInto.nbtList.add(entityNbt);
             }
         }
     }
-    public static int indexOfEntity(List<TexturesPlusEntity> entities, TexturesPlusEntity entityToFind)
-    {
+
+    public static int indexOfEntity(List<TexturesPlusEntity> entities, TexturesPlusEntity entityToFind) {
         int index = -1;
-        for(TexturesPlusEntity entity : entities)
-        {
+        for (TexturesPlusEntity entity : entities) {
             index++;
-            if(entity.entityType.equals(entityToFind.entityType))
-            {
+            if (entity.entityType.equals(entityToFind.entityType)) {
                 return index;
             }
         }
         return -1;
     }
-    public static void createWestCreatures(StringBuilder sb, List<TexturesPlusEntity> entities)
+
+    public static void createCreatures(StringBuilder sb, List<TexturesPlusEntity> entities, String direction)
     {
-        String block = "lime_concrete";
-        int x = 0;
-        int y = -53;
-        int z = -31;
-        for(TexturesPlusEntity entity : entities)
-        {
-            if(Math.abs(x) / 4 >= entities.size()/3)
-            {
-                if(Math.abs(x) / 4 >= entities.size() * 2/3)
-                {
-                    block = "purple_concrete";
-                }
-                else
-                {
-                    block = "blue_concrete";
+        String block = miscStringArgs.get(direction + "_block_1");
+        int x = miscArgs.get("x_origin");
+        int y = miscArgs.get("y_origin");
+        int z = miscArgs.get("z_origin");
+        for (TexturesPlusEntity entity : entities) {
+            if (Math.abs(x) / 4 >= entities.size() / 3) {
+                if (Math.abs(x) / 4 >= entities.size() * 2 / 3) {
+                    block = miscStringArgs.get(direction + "_block_3");
+                    ;
+                } else {
+                    block = miscStringArgs.get(direction + "_block_2");
+                    ;
                 }
             }
-            x-=4;
-            z-=4;
-            sb.append("function texturesplus:creatures/placenewrowwest {x:" + x + ",y:" + y + ",z:" + z + ",block:\"" + block + "\"}\n");
-            createCreatureRow(sb,entity,x,y,z,block);
+            x += miscArgs.get("row_size") * miscArgs.get(direction + "_direction");
+            z -= miscArgs.get("row_size");
+            int increment = miscArgs.get("default_increment");
+            for (Map.Entry<String, Integer> entry : entityIncrements.entrySet()) {
+                if (entity.entityType.contains(entry.getKey())) {
+                    increment = entry.getValue();
+                    break;
+                }
+            }
+            sb.append("function texturesplus:creatures/placenewrow" + direction + " {x:" + x + ",y:" + y + ",z:" + z + ",block:\"" + block + "\"}\n");
+            createCreatureRow(sb, entity, x, y, z, increment, block);
         }
     }
-    public static void createEastCreatures(StringBuilder sb, List<TexturesPlusEntity> entities)
-    {
-        String block = "yellow_concrete";
-        int x = 0;
-        int y = -53;
-        int z = -31;
-        for(TexturesPlusEntity entity : entities)
-        {
-            if(Math.abs(x) / 4 >= entities.size()/3)
-            {
-                if(Math.abs(x) / 4 >= entities.size() * 2/3)
-                {
-                    block = "red_concrete";
+
+    public static void placeNewMachine(StringBuilder sb, int x, int y, int z, String entity) {
+        int[] offsets = entityMachinePlacements.get(entity);
+
+        sb.append("execute positioned "
+                + (x + offsets[0]) + " "
+                + (y + offsets[1]) + " "
+                + (z + offsets[2])
+                + " run place template texturesplus:machine/" + entity + "\n");
+    }
+
+    public static void copyMachinesToData() {
+        String creaturesPath = "creaturesplus";
+        if (TexturesPlusModClient.getConfig().devMode) {
+            creaturesPath = "creatures";
+        }
+
+        Path runDir = MinecraftClient.getInstance().runDirectory.toPath();
+
+        Path source = runDir.resolve(Paths.get(
+                "resourcepacks", creaturesPath, "assets", "creatures", "machine"
+        ));
+
+        Path target = runDir.resolve(Paths.get(
+                "saves", "TexturesPlusGenerated", "datapacks", "texturesplus",
+                "data", "texturesplus", "structure", "machine"
+        ));
+
+        try (Stream<Path> stream = Files.walk(source)) {
+            stream.forEach(src -> {
+                try {
+                    Path relative = source.relativize(src);
+                    Path dest = target.resolve(relative);
+
+                    if (Files.isDirectory(src)) {
+                        Files.createDirectories(dest);
+                    } else {
+                        Files.createDirectories(dest.getParent());
+                        Files.copy(src, dest, StandardCopyOption.REPLACE_EXISTING);
+                    }
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
                 }
-                else
-                {
-                    block = "orange_concrete";
-                }
-            }
-            x+=4;
-            z-=4;
-            sb.append("function texturesplus:creatures/placenewroweast {x:" + x + ",y:" + y + ",z:" + z + ",block:\"" + block + "\"}\n");
-            createCreatureRow(sb,entity,x,y,z,block);
+            });
+        } catch (IOException | UncheckedIOException e) {
+            System.err.println("Failed to copy machines: " + e.getMessage());
         }
     }
-    public static void createCreatureRow(StringBuilder sb, TexturesPlusEntity entity, int x, int y, int z, String block)
+    public static void createCreatureRow(StringBuilder sb, TexturesPlusEntity entity, int x, int y, int z, int increment, String block)
     {
-        int increment = 3;
-        for (Map.Entry<String, Integer> entry : entityIncrements.entrySet()) {
-            if (entity.entityType.contains(entry.getKey())) {
-                increment = entry.getValue();
-                break;
-            }
+        if (entityMachinePlacements.containsKey(entity.entityType))
+        {
+            placeNewMachine(sb, x, y, z, entity.entityType);
         }
+
         for(TexturesPlusEntityNbt nbtData : entity.nbtList)
         {
             z-=increment;
@@ -445,11 +465,15 @@ public class CreaturesPlusDatapackGenerator {
 
         } else if (propName.equals("horse_zombie")) {
             entityType = "zombie_horse";
-
+            nbtString = rawNbtString = "Tame:1";
+        } else if (propName.equals("mule")) {
+            nbtString = rawNbtString = "Tame:1";
+        } else if (propName.equals("donkey")) {
+            nbtString = rawNbtString = "Tame:1";
         } else if (propName.startsWith("horse")) {
             entityType = "horse";
             int variant = selectVariant(propName, Map.of("creamy", 1, "chestnut", 2, "darkbrown", 6, "black", 4, "gray", 5, "brown", 3));
-            nbtString = rawNbtString = "Variant:" + variant;
+            nbtString = rawNbtString = "Tame:1,Variant:" + variant;
 
         } else if (propName.startsWith("bee_")) {
             if (TexturesPlusModClient.getConfig().mergeEntities) return null;
@@ -573,7 +597,26 @@ public class CreaturesPlusDatapackGenerator {
         }
         return output;
     }
-
+    public static List<String> getEntitiesWithMachines() {
+        String creaturesPath = "creaturesplus";
+        if (TexturesPlusModClient.getConfig().devMode) {
+            creaturesPath = "creatures";
+        }
+        List<String> output = new ArrayList<>();
+        try {
+            Path machineFolder = Paths.get(MinecraftClient.getInstance().runDirectory.getPath(), "resourcepacks", creaturesPath, "assets", "creatures","machine");
+            output = Files.list(machineFolder)
+                    .filter(Files::isRegularFile)
+                    .map(Path::getFileName)
+                    .map(Path::toString)
+                    .filter(name -> name.endsWith(".nbt"))
+                    .map(name -> name.substring(0, name.length() - 4)) // strip ".nbt"
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            System.err.println("Could not find any nbt files" + e.getMessage());
+        }
+        return output;
+    }
     public static Map<String, Integer> getEntityIncrements() {
         String creaturesPath = "creaturesplus";
         if (TexturesPlusModClient.getConfig().devMode) {
@@ -600,6 +643,117 @@ public class CreaturesPlusDatapackGenerator {
         } catch (IOException e) {
             System.err.println("Could not read entity_increments.txt: " + e.getMessage());
         }
+        return map;
+    }
+
+    public static Map<String, Integer> getMiscArgs() {
+        String creaturesPath = "creaturesplus";
+        if (TexturesPlusModClient.getConfig().devMode) {
+            creaturesPath = "creatures";
+        }
+        Path txtFile = Paths.get(MinecraftClient.getInstance().runDirectory.getPath(), "resourcepacks", creaturesPath, "assets", "creatures","init_args.txt");
+
+        Map<String, Integer> map = new HashMap<>();
+        try (Stream<String> lines = Files.lines(txtFile)) {
+            lines.map(String::trim)
+                    .filter(line -> !line.isEmpty() && line.contains(","))
+                    .forEach(line -> {
+                        String[] parts = line.split(",", 2);
+                        if (parts.length == 2) {
+                            String key = parts[0].trim();
+                            try {
+                                int value = Integer.parseInt(parts[1].trim());
+                                map.put(key, value);
+                            } catch (NumberFormatException e) {
+                                System.err.println("Invalid number for key: " + key);
+                            }
+                        }
+                    });
+        } catch (IOException e) {
+            System.err.println("Could not read misc_args.txt: " + e.getMessage());
+        }
+        return map;
+    }
+
+    public static Map<String, String> getMiscStringArgs() {
+        String creaturesPath = "creaturesplus";
+        if (TexturesPlusModClient.getConfig().devMode) {
+            creaturesPath = "creatures";
+        }
+        Path txtFile = Paths.get(MinecraftClient.getInstance().runDirectory.getPath(), "resourcepacks", creaturesPath, "assets", "creatures","init_string_args.txt");
+
+        Map<String, String> map = new HashMap<>();
+        try (Stream<String> lines = Files.lines(txtFile)) {
+            lines.map(String::trim)
+                    .filter(line -> !line.isEmpty() && line.contains(","))
+                    .forEach(line -> {
+                        String[] parts = line.split(",", 2);
+                        if (parts.length == 2) {
+                            String key = parts[0].trim();
+                            try {
+                                String value = parts[1].trim();
+                                map.put(key, value);
+                            } catch (NumberFormatException e) {
+                                System.err.println("Invalid number for key: " + key);
+                            }
+                        }
+                    });
+        } catch (IOException e) {
+            System.err.println("Could not read misc_args.txt: " + e.getMessage());
+        }
+        return map;
+    }
+
+    public static Map<String, int[]> getEntityMachineSize() {
+        String creaturesPath = "creaturesplus";
+        if (TexturesPlusModClient.getConfig().devMode) {
+            creaturesPath = "creatures";
+        }
+
+        Path txtFile = Paths.get(
+                MinecraftClient.getInstance().runDirectory.getPath(),
+                "resourcepacks",
+                creaturesPath,
+                "assets",
+                "creatures",
+                "machine",
+                "machine_pos.txt"
+        );
+
+        Map<String, int[]> map = new HashMap<>();
+
+        try (Stream<String> lines = Files.lines(txtFile)) {
+            lines.map(String::trim)
+                    .filter(line -> !line.isEmpty() && line.contains(","))
+                    .forEach(line -> {
+                        String[] parts = line.split(",");
+                        if (parts.length >= 2) {
+                            String key = parts[0].trim();
+
+                            int[] values = new int[parts.length - 1];
+                            boolean valid = true;
+
+                            for (int i = 1; i < parts.length; i++) {
+                                try {
+                                    values[i - 1] = Integer.parseInt(parts[i].trim());
+                                } catch (NumberFormatException e) {
+                                    System.err.println("Invalid number for key: " + key +
+                                            " at index " + (i - 1) +
+                                            " value: " + parts[i]);
+                                    valid = false;
+                                    break;
+                                }
+                            }
+
+                            if (valid) {
+                                map.put(key, values);
+                            }
+                        }
+                    });
+        } catch (IOException e) {
+            System.err.println("Could not read machine_pos.txt: " + e.getMessage());
+        }
+
         return map;
     }
 }
