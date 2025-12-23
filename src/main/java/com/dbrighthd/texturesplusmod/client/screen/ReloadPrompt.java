@@ -2,6 +2,7 @@ package com.dbrighthd.texturesplusmod.client.screen;
 
 import com.google.common.collect.Lists;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.Alignment;
 import net.minecraft.client.font.MultilineText;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -71,8 +72,10 @@ public class ReloadPrompt extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
+
         context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 70, Colors.WHITE);
-        this.messageSplit.draw(context, MultilineText.Alignment.CENTER, this.width / 2, 90, 9, true, 0xFFFFFFFF);
+
+        this.messageSplit.draw(Alignment.CENTER, this.width / 2, 90, 9, context.getTextConsumer());
     }
 
     private int getTitleY() {

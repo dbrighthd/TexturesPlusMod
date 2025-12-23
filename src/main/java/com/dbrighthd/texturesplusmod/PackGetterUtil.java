@@ -4,7 +4,6 @@ import com.dbrighthd.texturesplusmod.client.pojo.LatestCommit;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.http.HttpException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import oshi.util.tuples.Pair;
@@ -75,7 +74,7 @@ public class PackGetterUtil {
             int status = con.getResponseCode();
             if (status != 200) {
                 LOGGER.error("Failed to download pack {} from {}, status: {}", pack, url, status);
-                throw new HttpException("Status Code = " + status + " != 200");
+                throw new java.io.IOException("Status Code = " + status + " != 200");
             }
 
             byte[] bytes = con.getInputStream().readAllBytes();

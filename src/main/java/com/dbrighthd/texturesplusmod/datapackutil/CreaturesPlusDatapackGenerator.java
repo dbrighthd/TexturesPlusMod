@@ -3,7 +3,6 @@ package com.dbrighthd.texturesplusmod.datapackutil;
 import com.dbrighthd.texturesplusmod.client.TexturesPlusModClient;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import net.fabricmc.fabric.impl.resource.loader.ModResourcePackUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
