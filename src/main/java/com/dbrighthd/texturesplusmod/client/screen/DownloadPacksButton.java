@@ -26,6 +26,10 @@ public class DownloadPacksButton extends AbstractButton {
     public static final Identifier DISABLED = Identifier.fromNamespaceAndPath(MODID, "textures/gui/sprites/button_disabled.png");
     public static final Identifier LOADING = Identifier.fromNamespaceAndPath(MODID, "textures/gui/sprites/loading.png");
 
+    public static final Identifier FOCUSED_RELATIVE = Identifier.fromNamespaceAndPath(MODID, "button_focused");
+    public static final Identifier UNFOCUSED_RELATIVE = Identifier.fromNamespaceAndPath(MODID, "button_unfocused");
+    public static final Identifier DISABLED_RELATIVE = Identifier.fromNamespaceAndPath(MODID, "button_disabled");
+
     public static void registerTextures(TextureManager textureManager) {
         textureManager.registerForNextReload(FOCUSED);
         textureManager.registerForNextReload(UNFOCUSED);

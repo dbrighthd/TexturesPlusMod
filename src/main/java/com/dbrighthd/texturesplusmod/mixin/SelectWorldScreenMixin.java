@@ -31,7 +31,7 @@ public abstract class SelectWorldScreenMixin extends Screen {
 
         ImageButton tButton = new ImageButton(
                 x, y, 22, 22,
-                new WidgetSprites(DownloadPacksButton.UNFOCUSED, DownloadPacksButton.DISABLED, DownloadPacksButton.FOCUSED),
+                new WidgetSprites(DownloadPacksButton.UNFOCUSED_RELATIVE, DownloadPacksButton.DISABLED_RELATIVE, DownloadPacksButton.FOCUSED_RELATIVE),
                 (button) -> onPressed((ImageButton) button),
                 Component.translatable(MODID + ".open_tooltip")
         );
