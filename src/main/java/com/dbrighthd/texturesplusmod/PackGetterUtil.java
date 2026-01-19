@@ -4,8 +4,6 @@ import com.dbrighthd.texturesplusmod.client.pojo.LatestCommit;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import oshi.util.tuples.Pair;
 
 import java.io.*;
@@ -21,9 +19,10 @@ import java.util.concurrent.Executors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import static com.dbrighthd.texturesplusmod.TexturesPlusMod.LOGGER;
+
 public class PackGetterUtil {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger("texturesplusmod");
     private static final ExecutorService POOL = Executors.newVirtualThreadPerTaskExecutor();
 
     public static void downloadFile(URL url, String fileName) throws Exception { // this is left alone, it's fine as is.
@@ -173,21 +172,22 @@ public class PackGetterUtil {
         CompletableFuture<Pair<String, Boolean>> pumpkins = downloadResourcePack("pumpkins", !async);
         CompletableFuture<Pair<String, Boolean>> weapons = downloadResourcePack("weapons", !async);
         CompletableFuture<Pair<String, Boolean>> creatures = downloadResourcePack("creatures", !async);
-        elytras.whenComplete((s, e) -> {
-            didElytrasUpdate = s.getB();
-        });
-        pumpkins.whenComplete((s, e) -> {
-            didPumpkinsUpdate = s.getB();
-        });
-        weapons.whenComplete((s, e) -> {
-            didWeaponsUpdate = s.getB();
-        });
-        creatures.whenComplete((s, e) -> {
-            didCreaturesUpdate = s.getB();
-        });
+        elytras.whenComplete((s, e) ->
+            didElytrasUpdate = s.getB()
+        );
+        pumpkins.whenComplete((s, e) ->
+            didPumpkinsUpdate = s.getB()
+        );
+        weapons.whenComplete((s, e) ->
+            didWeaponsUpdate = s.getB()
+        );
+        creatures.whenComplete((s, e) ->
+            didCreaturesUpdate = s.getB()
+        );
         return CompletableFuture.allOf(elytras, pumpkins, weapons, creatures);
     }
 
+    @SuppressWarnings("unused")
     public static String getTexturesPlusPackId(String pack) {
         return getResourcePackIdFromPath(getPathFromTexturesPlusName(pack));
     }

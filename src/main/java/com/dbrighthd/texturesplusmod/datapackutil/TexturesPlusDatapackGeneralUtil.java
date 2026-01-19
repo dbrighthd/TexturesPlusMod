@@ -2,16 +2,15 @@ package com.dbrighthd.texturesplusmod.datapackutil;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
-import static com.mojang.text2speech.Narrator.LOGGER;
+import static com.dbrighthd.texturesplusmod.TexturesPlusMod.LOGGER;
 
 public class TexturesPlusDatapackGeneralUtil {
 
@@ -105,7 +104,7 @@ public class TexturesPlusDatapackGeneralUtil {
     public static void generateMapEntry(Map<String,List<TexturesPlusItem>> itemMap, Path jsonFile)
     {
         ObjectMapper mapper = new ObjectMapper();
-        JsonNode root = null;
+        JsonNode root;
         try {
             root = mapper.readTree(jsonFile.toFile());
         } catch (IOException e) {
@@ -113,7 +112,7 @@ public class TexturesPlusDatapackGeneralUtil {
         }
         String itemName = jsonFile.getFileName().toString().replace(".json","");
         JsonNode cases = root.path("model").path("cases");
-        List<TexturesPlusItem> allRenameCases = new ArrayList<TexturesPlusItem>();
+        List<TexturesPlusItem> allRenameCases = new ArrayList<>();
         if (cases.isArray()) {
             for (JsonNode caseNode : cases) {
                 getConditions(itemName, allRenameCases,caseNode);
@@ -129,13 +128,13 @@ public class TexturesPlusDatapackGeneralUtil {
         JsonNode node = currCase.get("model");
         if(node == null)
         {
-            LOGGER.error("Model wasnt found for an item in " + itemType);
+            LOGGER.error("Model wasn't found for an item in {}", itemType);
             return;
         }
         String firstWhen = null;
         String modelPath;
         JsonNode whenNode = currCase.get("when");
-        if (whenNode.isArray() && whenNode.size() > 0) {
+        if (whenNode.isArray() && !whenNode.isEmpty()) {
             firstWhen = whenNode.get(0).asText();
         }
         else if (whenNode.isTextual()) {
@@ -144,8 +143,7 @@ public class TexturesPlusDatapackGeneralUtil {
         if(node.get("type").asText().contains("model"))
         {
             modelPath = node.get("model").asText();
-            itemJsonData.add(new TexturesPlusItem(new ArrayList<String>(), firstWhen, 0, itemType, modelPath));
-            return;
+            itemJsonData.add(new TexturesPlusItem(new ArrayList<>(), firstWhen, 0, itemType, modelPath));
         }
         else
         {
@@ -154,7 +152,7 @@ public class TexturesPlusDatapackGeneralUtil {
                 currCase = currCase.get("model");
             }
 
-            List<TexturesPlusItem> itemsToAdd = getConditionsRecur(new ArrayList<String>(), currCase, itemType, firstWhen, 0);
+            List<TexturesPlusItem> itemsToAdd = getConditionsRecur(new ArrayList<>(), currCase, itemType, firstWhen, 0);
             if(!itemsToAdd.isEmpty())
             {
                 itemJsonData.addAll(itemsToAdd);
@@ -164,13 +162,11 @@ public class TexturesPlusDatapackGeneralUtil {
     }
     public static List<TexturesPlusItem> getConditionsRecur(List<String> enchants, JsonNode node, String itemType, String firstWhen, int damage)
     {
-        List<TexturesPlusItem> foundItems = new ArrayList<TexturesPlusItem>();
+        List<TexturesPlusItem> foundItems = new ArrayList<>();
         try {
-            List<String> falseEnchants = enchants;
             if (node.has("type") && node.get("type").asText().contains("model")) {
-                String modelPath = null;
-                modelPath = node.get("model").asText();
-                foundItems.add(new TexturesPlusItem(new ArrayList<String>(), firstWhen, 0, itemType, modelPath));
+                String modelPath = node.get("model").asText();
+                foundItems.add(new TexturesPlusItem(new ArrayList<>(), firstWhen, 0, itemType, modelPath));
             }
             if (node.has("predicate") && node.get("predicate").asText().contains("minecraft:enchantments")) {
                 for (JsonNode entry : node.path("value")) {
@@ -187,9 +183,9 @@ public class TexturesPlusDatapackGeneralUtil {
                 } else {
                     if(!node.get("property").asText().contains("selected"))
                     {
-                        foundItems.addAll(getConditionsRecur(falseEnchants, node.get("on_true"), itemType, firstWhen, damage));
+                        foundItems.addAll(getConditionsRecur(enchants, node.get("on_true"), itemType, firstWhen, damage));
                     }
-                    foundItems.addAll(getConditionsRecur(falseEnchants, node.get("on_false"), itemType, firstWhen, damage));
+                    foundItems.addAll(getConditionsRecur(enchants, node.get("on_false"), itemType, firstWhen, damage));
                 }
             }
             if (node.get("type") != null && node.get("type").asText().contains("range_dispatch")) {
@@ -240,7 +236,7 @@ public class TexturesPlusDatapackGeneralUtil {
             }
             if(foundItems.isEmpty())
             {
-                LOGGER.error("Failed to find model in item " + firstWhen);
+                LOGGER.error("Failed to find model in item {}", firstWhen);
             }
             return foundItems;
         } catch (Exception e) {
@@ -250,7 +246,7 @@ public class TexturesPlusDatapackGeneralUtil {
 
     }
     public static int getMaxDurability(String itemId) {
-        Item item = Registries.ITEM.get(Identifier.of(itemId));
+        Item item = BuiltInRegistries.ITEM.getValue(Identifier.parse(itemId));
         return new ItemStack(item).getMaxDamage();
     }
 

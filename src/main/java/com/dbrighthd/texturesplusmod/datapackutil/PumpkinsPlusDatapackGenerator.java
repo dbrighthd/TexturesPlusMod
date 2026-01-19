@@ -3,8 +3,6 @@ package com.dbrighthd.texturesplusmod.datapackutil;
 import com.dbrighthd.texturesplusmod.client.TexturesPlusModClient;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.minecraft.client.MinecraftClient;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,8 +10,9 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.client.Minecraft;
 
-import static com.mojang.text2speech.Narrator.LOGGER;
+import static com.dbrighthd.texturesplusmod.TexturesPlusMod.LOGGER;
 
 public class PumpkinsPlusDatapackGenerator {
     public static void generatePumpkinsMcfunction() throws IOException {
@@ -24,7 +23,7 @@ public class PumpkinsPlusDatapackGenerator {
         {
             pumpkinPath = "pumpkins";
         }
-        Path jsonFile = Paths.get(MinecraftClient.getInstance().runDirectory.getPath(), "resourcepacks", pumpkinPath,"assets","minecraft","items","carved_pumpkin.json");
+        Path jsonFile = Paths.get(Minecraft.getInstance().gameDirectory.getPath(), "resourcepacks", pumpkinPath,"assets","minecraft","items","carved_pumpkin.json");
 
         // Initialize Jackson
         ObjectMapper mapper = new ObjectMapper();
@@ -52,7 +51,7 @@ public class PumpkinsPlusDatapackGenerator {
                     String firstWhen = null;
 
                     // Case: "when" is an array
-                    if (whenNode.isArray() && whenNode.size() > 0) {
+                    if (whenNode.isArray() && !whenNode.isEmpty()) {
                         firstWhen = whenNode.get(0).asText();
                     }
 
@@ -106,10 +105,12 @@ public class PumpkinsPlusDatapackGenerator {
         //hats, -14 -53 25, purple_concrete, west
         createPumpkinRow(sb, hats, -14, -53, 25, "purple_concrete", "west");
 
-        Path functionPath = Paths.get(MinecraftClient.getInstance().runDirectory.getPath(), "saves", "TexturesPlusGenerated","datapacks","texturesplus","data","texturesplus","function","allpumpkins.mcfunction");
+        Path functionPath = Paths.get(Minecraft.getInstance().gameDirectory.getPath(), "saves", "TexturesPlusGenerated","datapacks","texturesplus","data","texturesplus","function","allpumpkins.mcfunction");
 
         Files.writeString(functionPath, sb.toString(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
     }
+
+    @SuppressWarnings("SameParameterValue")
     static void createPumpkinRow(StringBuilder sb, List<String> names, int x, int y, int z, String block, String direction)
     {
         for (String name : names)

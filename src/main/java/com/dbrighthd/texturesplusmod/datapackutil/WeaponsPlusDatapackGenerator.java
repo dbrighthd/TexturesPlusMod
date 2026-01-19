@@ -1,14 +1,13 @@
 package com.dbrighthd.texturesplusmod.datapackutil;
 
 import com.dbrighthd.texturesplusmod.client.TexturesPlusModClient;
-import net.minecraft.client.MinecraftClient;
-
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
 import java.util.regex.Pattern;
+import net.minecraft.client.Minecraft;
 
-import static com.mojang.text2speech.Narrator.LOGGER;
+import static com.dbrighthd.texturesplusmod.TexturesPlusMod.LOGGER;
 
 public class WeaponsPlusDatapackGenerator {
     public static void generateWeaponsMcfunction() throws IOException {
@@ -19,9 +18,9 @@ public class WeaponsPlusDatapackGenerator {
         if (TexturesPlusModClient.getConfig().devMode) {
             weaponsPath = "weapons";
         }
-        Path dir = Paths.get(MinecraftClient.getInstance().runDirectory.getPath(), "resourcepacks", weaponsPath, "assets", "minecraft", "items");
-        Path groupsPath = Paths.get(MinecraftClient.getInstance().runDirectory.getPath(), "resourcepacks", weaponsPath, "assets", "minecraft", "items", "grouping");
-        Path materialsPath = Paths.get(MinecraftClient.getInstance().runDirectory.getPath(), "resourcepacks", weaponsPath, "assets", "minecraft", "items", "grouping", "materials.txt");
+        Path dir = Paths.get(Minecraft.getInstance().gameDirectory.getPath(), "resourcepacks", weaponsPath, "assets", "minecraft", "items");
+        Path groupsPath = Paths.get(Minecraft.getInstance().gameDirectory.getPath(), "resourcepacks", weaponsPath, "assets", "minecraft", "items", "grouping");
+        Path materialsPath = Paths.get(Minecraft.getInstance().gameDirectory.getPath(), "resourcepacks", weaponsPath, "assets", "minecraft", "items", "grouping", "materials.txt");
 
         Map<String, List<TexturesPlusItem>> itemMap = new LinkedHashMap<>();
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir, "*.json")) {
@@ -120,23 +119,24 @@ public class WeaponsPlusDatapackGenerator {
         //swords -25 -53 -8, blue_concrete, north
         createWeaponRow(sb,swords,-25,-53,-8,"blue_concrete","north", regexGroupPatternsSword, materials);
 
-        Path functionPath = Paths.get(MinecraftClient.getInstance().runDirectory.getPath(), "saves", "TexturesPlusGenerated","datapacks","texturesplus","data","texturesplus","function","allweapons.mcfunction");
+        Path functionPath = Paths.get(Minecraft.getInstance().gameDirectory.getPath(), "saves", "TexturesPlusGenerated","datapacks","texturesplus","data","texturesplus","function","allweapons.mcfunction");
 
         Files.writeString(functionPath, sb.toString(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
     }
-    public static List<List<TexturesPlusItem>> groupByItemSuffix(List<TexturesPlusItem> items, List<Pattern> regexGoupPatterns, List<String> materials) throws IOException {
+
+    public static List<List<TexturesPlusItem>> groupByItemSuffix(List<TexturesPlusItem> items, List<Pattern> regexGoupPatterns, List<String> materials) {
 
         Map<String, List<TexturesPlusItem>> grouped = new LinkedHashMap<>();
         List<TexturesPlusItem> misc = new ArrayList<>();
 
         // 1. Group by material
         for (TexturesPlusItem item : items) {
-            String typeUpper = item.rename.toUpperCase();
+            String typeUpper = item.rename().toUpperCase();
             boolean matched = false;
 
             for (String mat : materials) {
                 if (typeUpper.startsWith(mat)) {
-                    String suffix = item.rename.substring(mat.length()).trim().toLowerCase();
+                    String suffix = item.rename().substring(mat.length()).trim().toLowerCase();
                     grouped.computeIfAbsent("material:" + suffix, k -> new ArrayList<>()).add(item);
                     matched = true;
                     break;
@@ -156,7 +156,7 @@ public class WeaponsPlusDatapackGenerator {
         for (Pattern pattern : regexGoupPatterns) {
             for (TexturesPlusItem item : misc) {
                 if (regexMatched.contains(item)) continue;
-                if (pattern.matcher(item.rename).matches()) {
+                if (pattern.matcher(item.rename()).matches()) {
                     String key = "regex:" + pattern.pattern();
                     miscGrouped.computeIfAbsent(key, k -> new ArrayList<>()).add(item);
                     regexMatched.add(item);
@@ -167,7 +167,7 @@ public class WeaponsPlusDatapackGenerator {
         // 4. Group exact name matches for unmatched
         for (TexturesPlusItem item : misc) {
             if (!regexMatched.contains(item)) {
-                miscGrouped.computeIfAbsent("exact:" + item.rename.toLowerCase(), k -> new ArrayList<>()).add(item);
+                miscGrouped.computeIfAbsent("exact:" + item.rename().toLowerCase(), k -> new ArrayList<>()).add(item);
             }
         }
 
@@ -195,8 +195,8 @@ public class WeaponsPlusDatapackGenerator {
         return result;
     }
     public static int compareByMaterialOrder(TexturesPlusItem a, TexturesPlusItem b, List<String> materials) {
-        int indexA = getMaterialIndex(a.rename, materials);
-        int indexB = getMaterialIndex(b.rename, materials);
+        int indexA = getMaterialIndex(a.rename(), materials);
+        int indexB = getMaterialIndex(b.rename(), materials);
         return Integer.compare(indexA, indexB);
     }
 
@@ -208,7 +208,7 @@ public class WeaponsPlusDatapackGenerator {
         }
         return Integer.MAX_VALUE; // Items without a material go to the end
     }
-    static void createWeaponRow(StringBuilder sb, List<TexturesPlusItem> items, int x, int y, int z, String block, String direction, List<Pattern> regexGoupPatterns, List<String> materials) throws IOException {
+    static void createWeaponRow(StringBuilder sb, List<TexturesPlusItem> items, int x, int y, int z, String block, String direction, List<Pattern> regexGoupPatterns, List<String> materials) {
         x--;
         List<List<TexturesPlusItem>> sections = groupByItemSuffix(items, regexGoupPatterns, materials);
         for(List<TexturesPlusItem> section : sections)
@@ -219,23 +219,23 @@ public class WeaponsPlusDatapackGenerator {
             }
             else
             {
-                if(section.getFirst().enchantments.isEmpty())
+                if(section.getFirst().enchantments().isEmpty())
                 {
-                    sb.append("function texturesplus:weapons/placemultweapons" + direction + "start {block:\"" + block + "\", x:" + x + ",y:" + y + ",z:" + z + "}\n");
+                    sb.append("function texturesplus:weapons/placemultweapons").append(direction).append("start {block:\"").append(block).append("\", x:").append(x).append(",y:").append(y).append(",z:").append(z).append("}\n");
                     int num = 0;
                     for(TexturesPlusItem item : section)
                     {
-                        sb.append(generateWeaponMultCommand(x,y,z,item.rename,block,direction,item.damage, item.itemType,getSpecialBlock(item.itemType, block), num)).append("\n");
+                        sb.append(generateWeaponMultCommand(x,y,z, item.rename(),block,direction, item.damage(), item.itemType(),getSpecialBlock(item.itemType(), block), num)).append("\n");
                         num++;
                     }
                 }
                 else
                 {
-                    sb.append("function texturesplus:weapons/placemultweapons" + direction + "startenchant {block:\"" + block + "\", x:" + x + ",y:" + y + ",z:" + z + ",enchantment:" + section.getFirst().enchantments.getFirst().replace("minecraft:","") + "}\n");
+                    sb.append("function texturesplus:weapons/placemultweapons").append(direction).append("startenchant {block:\"").append(block).append("\", x:").append(x).append(",y:").append(y).append(",z:").append(z).append(",enchantment:").append(section.getFirst().enchantments().getFirst().replace("minecraft:", "")).append("}\n");
                     int num = 0;
                     for(TexturesPlusItem item : section)
                     {
-                        sb.append(generateWeaponMultCommandEnchant(x,y,z,item.rename,block,direction,item.damage, item.enchantments.getFirst(), item.itemType,getSpecialBlock(item.itemType, block), num)).append("\n");
+                        sb.append(generateWeaponMultCommandEnchant(x,y,z, item.rename(),block,direction, item.damage(), item.enchantments().getFirst(), item.itemType(),getSpecialBlock(item.itemType(), block), num)).append("\n");
                         num++;
                     }
                 }
@@ -247,13 +247,13 @@ public class WeaponsPlusDatapackGenerator {
     {
         for (TexturesPlusItem item : items)
         {
-            if(item.enchantments.isEmpty())
+            if(item.enchantments().isEmpty())
             {
-                sb.append(generateWeaponCommand(x,y,z,item.rename,block,direction,item.damage, item.itemType,getSpecialBlock(item.itemType, block))).append("\n");
+                sb.append(generateWeaponCommand(x,y,z, item.rename(),block,direction, item.damage(), item.itemType(),getSpecialBlock(item.itemType(), block))).append("\n");
             }
             else
             {
-                sb.append(generateEnchantedWeaponCommand(x,y,z,item.rename,block,direction,item.damage, item.enchantments.getFirst(), item.itemType,getSpecialBlock(item.itemType, block))).append("\n");
+                sb.append(generateEnchantedWeaponCommand(x,y,z, item.rename(),block,direction, item.damage(), item.enchantments().getFirst(), item.itemType(),getSpecialBlock(item.itemType(), block))).append("\n");
             }
             x -=1;
         }

@@ -3,16 +3,15 @@ package com.dbrighthd.texturesplusmod.datapackutil;
 import com.dbrighthd.texturesplusmod.client.TexturesPlusModClient;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.minecraft.client.MinecraftClient;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
+import net.minecraft.client.Minecraft;
 
-import static com.mojang.text2speech.Narrator.LOGGER;
+import static com.dbrighthd.texturesplusmod.TexturesPlusMod.LOGGER;
 
 public class ElytrasPlusDatapackGenerator {
     public static void generateElytrasMcfunction() throws IOException {
@@ -23,7 +22,7 @@ public class ElytrasPlusDatapackGenerator {
         {
             elytraPath = "elytras";
         }
-        Path jsonFile = Paths.get(MinecraftClient.getInstance().runDirectory.getPath(), "resourcepacks", elytraPath,"assets","minecraft","items","elytra.json");
+        Path jsonFile = Paths.get(Minecraft.getInstance().gameDirectory.getPath(), "resourcepacks", elytraPath,"assets","minecraft","items","elytra.json");
 
         // Initialize Jackson
         ObjectMapper mapper = new ObjectMapper();
@@ -50,7 +49,7 @@ public class ElytrasPlusDatapackGenerator {
                     String firstWhen = null;
 
                     // Case: "when" is an array
-                    if (whenNode.isArray() && whenNode.size() > 0) {
+                    if (whenNode.isArray() && !whenNode.isEmpty()) {
                         firstWhen = whenNode.get(0).asText();
                     }
 
@@ -151,7 +150,7 @@ public class ElytrasPlusDatapackGenerator {
 
         createCapeRow(sb,  cape, 25, -53, 14, "purple_concrete", "south", append);
 
-        Path functionPath = Paths.get(MinecraftClient.getInstance().runDirectory.getPath(), "saves", "TexturesPlusGenerated","datapacks","texturesplus","data","texturesplus","function","allelytras.mcfunction");
+        Path functionPath = Paths.get(Minecraft.getInstance().gameDirectory.getPath(), "saves", "TexturesPlusGenerated","datapacks","texturesplus","data","texturesplus","function","allelytras.mcfunction");
 
         Files.writeString(functionPath, sb.toString(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
     }
