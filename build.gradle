@@ -34,7 +34,7 @@ dependencies {
     modImplementation include ('com.fasterxml.jackson.core:jackson-annotations:2.13.3')
     modImplementation include ('com.fasterxml.jackson.core:jackson-core:2.13.3')
 
-    modApi("me.shedaniel.cloth:cloth-config-fabric:20.0.148") {
+    modApi("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}") {
         exclude(group: "net.fabricmc.fabric-api")
     }
 }
@@ -45,6 +45,7 @@ processResources {
 
     filesMatching("fabric.mod.json") {
         expand "version": project.version
+        expand "cloth_config_version": project.cloth_config_version
     }
 }
 

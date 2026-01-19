@@ -32,6 +32,13 @@
     "fabric": "*",
     "minecraft": "~1.21.11"
   },
+  "suggests": {
+    "modmenu": "*",
+    "cloth-config": "*",
+    "entity_texture_features": "*",
+    "entity_model_features": "*",
+    "animatica": "*"
+  },
   "custom": {
     "modmenu": {
       "links": {
