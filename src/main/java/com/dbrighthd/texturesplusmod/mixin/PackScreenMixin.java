@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.nio.file.Path;
 
 @Mixin(PackScreen.class)
-public abstract class ResourcePackScreenMixin extends Screen {
+public abstract class PackScreenMixin extends Screen {
     @Unique
     private DownloadPacksButton tButton;
 
@@ -23,7 +23,7 @@ public abstract class ResourcePackScreenMixin extends Screen {
     @Final
     private Path file;
 
-    protected ResourcePackScreenMixin(Text title) {
+    protected PackScreenMixin(Text title) {
         super(title);
     }
 
