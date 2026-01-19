@@ -37,7 +37,10 @@
     "cloth-config": "*",
     "entity_texture_features": "*",
     "entity_model_features": "*",
-    "animatica": "*"
+    "entity_sound_features": "*",
+    "animatica": "*",
+    "dbrighthd_regex_mod": "*",
+    "variants-cit": "*"
   },
   "custom": {
     "modmenu": {
