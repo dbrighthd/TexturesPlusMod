@@ -1,6 +1,7 @@
 package com.dbrighthd.texturesplusmod.client;
 
 import com.dbrighthd.texturesplusmod.PackGetterUtil;
+import com.dbrighthd.texturesplusmod.TexturesPlusMod;
 import com.dbrighthd.texturesplusmod.client.config.ModConfig;
 import com.mojang.blaze3d.systems.RenderSystem;
 import me.shedaniel.autoconfig.AutoConfig;
@@ -8,14 +9,14 @@ import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import net.fabricmc.api.ClientModInitializer;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.minecraft.util.collection.ArrayListDeque;
+import net.minecraft.util.ArrayListDeque;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @net.fabricmc.api.Environment(net.fabricmc.api.EnvType.CLIENT)
 public class TexturesPlusModClient implements ClientModInitializer {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger("texturesplusmod");
+    public static final Logger LOGGER = LoggerFactory.getLogger(TexturesPlusMod.MODID + "-client");
 
     private static final ArrayListDeque<Runnable> tasks = new ArrayListDeque<>();
 

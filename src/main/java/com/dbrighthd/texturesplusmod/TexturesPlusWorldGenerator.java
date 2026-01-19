@@ -1,18 +1,18 @@
 package com.dbrighthd.texturesplusmod;
 
 import com.dbrighthd.texturesplusmod.datapackutil.*;
-import net.minecraft.client.MinecraftClient;
-
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.client.Minecraft;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.LongTag;
+import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
-import net.minecraft.nbt.NbtLong;
-import net.minecraft.nbt.NbtSizeTracker;
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.StandardCopyOption;
 import java.time.Instant;
@@ -21,9 +21,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import static com.mojang.text2speech.Narrator.LOGGER;
-
 public class TexturesPlusWorldGenerator {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TexturesPlusWorldGenerator.class);
 
     public static CompletableFuture<Void> generateWorldAsync() {
         return CompletableFuture.runAsync(() -> {
@@ -37,7 +37,7 @@ public class TexturesPlusWorldGenerator {
 
     public static void generateWorld() throws IOException, InterruptedException {
         LOGGER.info("Generating Textures+ test world...");
-        File worldDir = Paths.get(MinecraftClient.getInstance().runDirectory.getPath(), "saves", "TexturesPlusGenerated").toFile();
+        File worldDir = Paths.get(Minecraft.getInstance().gameDirectory.getPath(), "saves", "TexturesPlusGenerated").toFile();
         if (worldDir.exists()) {
             FileUtils.deleteDirectory(worldDir);
         }
@@ -52,13 +52,13 @@ public class TexturesPlusWorldGenerator {
             Path levelDat = worldDir.toPath().resolve("level.dat");
             if (Files.exists(levelDat)) {
                 try {
-                    NbtCompound root = NbtIo.readCompressed(levelDat, NbtSizeTracker.ofUnlimitedBytes());
-                    NbtCompound data = root.getCompound("Data").orElseGet(() -> {
-                        NbtCompound created = new NbtCompound();
+                    CompoundTag root = NbtIo.readCompressed(levelDat, NbtAccounter.unlimitedHeap());
+                    CompoundTag data = root.getCompound("Data").orElseGet(() -> {
+                        CompoundTag created = new CompoundTag();
                         root.put("Data", created);
                         return created;
                     });
-                    data.put("LastPlayed", NbtLong.of(System.currentTimeMillis()));
+                    data.put("LastPlayed", LongTag.valueOf(System.currentTimeMillis()));
                     NbtIo.writeCompressed(root, levelDat);
                     LOGGER.info("Set LastPlayed in level.dat to {}", Instant.ofEpochMilli(System.currentTimeMillis()));
                 } catch (IOException e) {
@@ -96,8 +96,10 @@ public class TexturesPlusWorldGenerator {
 
 
     }
+
+    @SuppressWarnings("SameParameterValue")
     private static void unzipWorldFileToSaves(Path filePathToUnzip, String worldName) {
-        File savesDir = new File(MinecraftClient.getInstance().runDirectory, "saves");
+        File savesDir = new File(Minecraft.getInstance().gameDirectory, "saves");
         File targetDir = new File(savesDir, worldName);
 
         try (ZipFile zip = new ZipFile(filePathToUnzip.toFile())) {
@@ -106,6 +108,7 @@ public class TexturesPlusWorldGenerator {
             }
 
             for (ZipEntry entry : Collections.list(zip.entries())) {
+                @SuppressWarnings("JvmTaintAnalysis")
                 File outFile = new File(targetDir, entry.getName());
 
                 if (entry.isDirectory()) {
