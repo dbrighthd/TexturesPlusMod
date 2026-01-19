@@ -6,8 +6,9 @@
   "mixins": [
   ],
   "client": [
+    "MinecraftClientMixin",
+    "PackScreenMixin",
     "ResourcePackEntryMixin",
-    "ResourcePackScreenMixin",
     "SelectWorldScreenMixin"
   ],
   "injectors": {

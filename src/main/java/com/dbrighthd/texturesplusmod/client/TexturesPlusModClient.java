@@ -1,7 +1,6 @@
 package com.dbrighthd.texturesplusmod.client;
 
 import com.dbrighthd.texturesplusmod.PackGetterUtil;
-import com.dbrighthd.texturesplusmod.TexturesPlusWorldGenerator;
 import com.dbrighthd.texturesplusmod.client.config.ModConfig;
 import com.mojang.blaze3d.systems.RenderSystem;
 import me.shedaniel.autoconfig.AutoConfig;
@@ -12,8 +11,6 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.util.collection.ArrayListDeque;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
 
 @net.fabricmc.api.Environment(net.fabricmc.api.EnvType.CLIENT)
 public class TexturesPlusModClient implements ClientModInitializer {
