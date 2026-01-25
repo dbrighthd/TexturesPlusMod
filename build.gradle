@@ -61,6 +61,10 @@ tasks.withType(JavaCompile).configureEach {
     }
 }
 
+loom {
+    accessWidenerPath = file("src/main/resources/texturesplusmod.classtweaker")
+}
+
 java {
     def javaVersion = JavaVersion.toVersion(targetJavaVersion)
     if (JavaVersion.current() < javaVersion) {

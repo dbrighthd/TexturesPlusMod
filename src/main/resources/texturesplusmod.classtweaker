@@ -1,0 +1,4 @@
+classTweaker v1 named
+accessible field net/minecraft/client/gui/screens/packs/TransferableSelectionList$PackEntry nameWidget Lnet/minecraft/client/gui/components/StringWidget;
+accessible field net/minecraft/client/gui/screens/packs/TransferableSelectionList$PackEntry descriptionWidget Lnet/minecraft/client/gui/components/MultiLineTextWidget;
+accessible field net/minecraft/client/gui/screens/packs/TransferableSelectionList INCOMPATIBLE_TITLE Lnet/minecraft/network/chat/Component;

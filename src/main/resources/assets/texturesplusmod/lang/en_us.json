@@ -25,5 +25,8 @@
   "text.autoconfig.texturesplusmod.option.ignoreTexturesPlusMcmeta": "Ignore Textures+ Mcmeta Version",
   "texturesplusmod.reload": "Reload",
   "texturesplusmod.reload.text": "A Resource Pack reload is required to apply the newly-downloaded Textures+ packs, reload now?",
-  "texturesplusmod.open_tooltip": "Check for updates to Textures+ packs"
+  "texturesplusmod.open_tooltip": "Check for updates to Textures+ packs",
+  "texturesplusmod.suboptimal": "Suboptimal",
+  "texturesplusmod.some_required_mods_are_missing": "(You're missing required mods, this pack won't work right)",
+  "texturesplusmod.some_mods_are_missing": "(Some mods are missing, your experience may be impacted)"
 }

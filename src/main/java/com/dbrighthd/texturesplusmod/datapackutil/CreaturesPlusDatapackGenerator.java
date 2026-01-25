@@ -532,7 +532,7 @@ public class CreaturesPlusDatapackGenerator {
         }
         if(!isValidEntityName(entityType))
         {
-            LOGGER.error(entityType + " is not a valid entity type, skipping.");
+            LOGGER.error("{} is not a valid entity type, skipping.", entityType);
             return null;
         }
         parsedEntities.add(entityType);
