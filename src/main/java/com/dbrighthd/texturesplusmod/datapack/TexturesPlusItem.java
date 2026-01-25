@@ -1,4 +1,4 @@
-package com.dbrighthd.texturesplusmod.datapackutil;
+package com.dbrighthd.texturesplusmod.datapack;
 
 import java.util.List;
 import java.util.Objects;

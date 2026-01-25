@@ -1,4 +1,4 @@
-package com.dbrighthd.texturesplusmod.datapackutil;
+package com.dbrighthd.texturesplusmod.datapack;
 
 import com.dbrighthd.texturesplusmod.client.TexturesPlusModClient;
 import java.io.IOException;

@@ -1,6 +1,6 @@
 package com.dbrighthd.texturesplusmod;
 
-import com.dbrighthd.texturesplusmod.datapackutil.*;
+import com.dbrighthd.texturesplusmod.datapack.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;

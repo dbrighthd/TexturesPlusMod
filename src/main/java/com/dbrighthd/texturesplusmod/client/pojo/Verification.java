@@ -1,34 +1,36 @@
-package com.dbrighthd.texturesplusmod.client.pojo; 
-import com.fasterxml.jackson.annotation.JsonProperty; 
-public class Verification{
-    @JsonProperty("verified") 
-    public boolean getVerified() { 
-		 return this.verified; } 
-    public void setVerified(boolean verified) { 
-		 this.verified = verified; } 
-    boolean verified;
-    @JsonProperty("reason") 
-    public String getReason() { 
-		 return this.reason; } 
-    public void setReason(String reason) { 
-		 this.reason = reason; } 
-    String reason;
-    @JsonProperty("signature") 
-    public Object getSignature() { 
-		 return this.signature; } 
-    public void setSignature(Object signature) { 
-		 this.signature = signature; } 
-    Object signature;
-    @JsonProperty("payload") 
-    public Object getPayload() { 
-		 return this.payload; } 
-    public void setPayload(Object payload) { 
-		 this.payload = payload; } 
-    Object payload;
-    @JsonProperty("verified_at")
-    public String getVerifiedAt() {
-        return this.verifiedAt; }
-    public void setVerifiedAt(String verifiedAt) {
-        this.verifiedAt = verifiedAt; }
-    String verifiedAt;
+package com.dbrighthd.texturesplusmod.client.pojo;
+
+import com.google.gson.annotations.SerializedName;
+
+public class Verification {
+
+    @SerializedName("verified")
+    private boolean verified;
+
+    @SerializedName("reason")
+    private String reason;
+
+    @SerializedName("signature")
+    private Object signature;
+
+    @SerializedName("payload")
+    private Object payload;
+
+    @SerializedName("verified_at")
+    private String verifiedAt;
+
+    public boolean verified() { return verified; }
+    public void verified(boolean verified) { this.verified = verified; }
+
+    public String reason() { return reason; }
+    public void reason(String reason) { this.reason = reason; }
+
+    public Object signature() { return signature; }
+    public void signature(Object signature) { this.signature = signature; }
+
+    public Object payload() { return payload; }
+    public void payload(Object payload) { this.payload = payload; }
+
+    public String verifiedAt() { return verifiedAt; }
+    public void verifiedAt(String verifiedAt) { this.verifiedAt = verifiedAt; }
 }

@@ -1,8 +1,8 @@
-package com.dbrighthd.texturesplusmod.datapackutil;
+package com.dbrighthd.texturesplusmod.datapack;
 
 import com.dbrighthd.texturesplusmod.client.TexturesPlusModClient;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,6 +10,11 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import net.minecraft.client.Minecraft;
 
 import static com.dbrighthd.texturesplusmod.TexturesPlusMod.LOGGER;
@@ -25,9 +30,10 @@ public class PumpkinsPlusDatapackGenerator {
         }
         Path jsonFile = Paths.get(Minecraft.getInstance().gameDirectory.getPath(), "resourcepacks", pumpkinPath,"assets","minecraft","items","carved_pumpkin.json");
 
-        // Initialize Jackson
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode root = mapper.readTree(jsonFile.toFile());
+        JsonObject root;
+        try (FileReader reader = new FileReader(jsonFile.toFile())) {
+            root = JsonParser.parseReader(reader).getAsJsonObject();
+        }
 
         List<String> references = new ArrayList<>();
         List<String> headwear = new ArrayList<>();
@@ -36,54 +42,57 @@ public class PumpkinsPlusDatapackGenerator {
         List<String> hats = new ArrayList<>();
         List<String> misc = new ArrayList<>();
         // Navigate to model.cases
-        JsonNode cases = root.path("model").path("cases");
+        if (root.has("model") && root.getAsJsonObject("model").has("cases")) {
+            JsonArray cases = root.getAsJsonObject("model").getAsJsonArray("cases");
 
-        if (cases.isArray()) {
-            for (JsonNode caseNode : cases) {
-                JsonNode whenNode = caseNode.get("when");
-                JsonNode modelPathNode = caseNode.path("model").path("model");
-                if(modelPathNode == null || !modelPathNode.isTextual())
-                {
-                    modelPathNode = caseNode.path("model").path("fallback").path("model");
+            for (JsonElement element : cases) {
+                JsonObject caseNode = element.getAsJsonObject();
+                JsonElement whenNode = caseNode.get("when");
+
+                String modelPath = null;
+
+                // Handle model navigation with fallback
+                if (caseNode.has("model")) {
+                    JsonObject modelObj = caseNode.getAsJsonObject("model");
+
+                    // Try direct model first
+                    if (modelObj.has("model")) {
+                        modelPath = modelObj.get("model").getAsString();
+                    }
+                    // Fallback logic
+                    else if (modelObj.has("fallback")) {
+                        JsonObject fallbackObj = modelObj.getAsJsonObject("fallback");
+                        if (fallbackObj.has("model")) {
+                            modelPath = fallbackObj.get("model").getAsString();
+                        }
+                    }
                 }
-                if (whenNode != null && modelPathNode != null && modelPathNode.isTextual()) {
-                    String modelPath = modelPathNode.asText();
+
+                if (whenNode != null && modelPath != null) {
                     String firstWhen = null;
 
                     // Case: "when" is an array
-                    if (whenNode.isArray() && !whenNode.isEmpty()) {
-                        firstWhen = whenNode.get(0).asText();
+                    if (whenNode.isJsonArray() && whenNode.getAsJsonArray().size() > 0) {
+                        firstWhen = whenNode.getAsJsonArray().get(0).getAsString();
                     }
-
                     // Case: "when" is a single string
-                    else if (whenNode.isTextual()) {
-                        firstWhen = whenNode.asText();
+                    else if (whenNode.isJsonPrimitive()) {
+                        firstWhen = whenNode.getAsString();
                     }
 
                     if (firstWhen != null) {
                         String lower = modelPath.toLowerCase();
-                        if (lower.contains("minecraft:block/pumpkins/references"))
-                        {
+                        if (lower.contains("minecraft:block/pumpkins/references")) {
                             references.add(firstWhen);
-                        }
-                        else if (lower.contains("minecraft:block/pumpkins/headwear"))
-                        {
+                        } else if (lower.contains("minecraft:block/pumpkins/headwear")) {
                             headwear.add(firstWhen);
-                        }
-                        else if (lower.contains("minecraft:block/pumpkins/animals"))
-                        {
+                        } else if (lower.contains("minecraft:block/pumpkins/animals")) {
                             animals.add(firstWhen);
-                        }
-                        else if (lower.contains("minecraft:block/pumpkins/cutesy"))
-                        {
+                        } else if (lower.contains("minecraft:block/pumpkins/cutesy")) {
                             cutesy.add(firstWhen);
-                        }
-                        else if (lower.contains("minecraft:block/hatsplus"))
-                        {
+                        } else if (lower.contains("minecraft:block/hatsplus")) {
                             hats.add(firstWhen);
-                        }
-                        else
-                        {
+                        } else {
                             misc.add(firstWhen);
                         }
                     }

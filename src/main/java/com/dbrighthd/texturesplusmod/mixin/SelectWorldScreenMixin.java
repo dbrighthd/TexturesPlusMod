@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static com.dbrighthd.texturesplusmod.TexturesPlusMod.MODID;
+import static com.dbrighthd.texturesplusmod.TexturesPlusMod.MOD_ID;
 
 @Mixin(SelectWorldScreen.class)
 public abstract class SelectWorldScreenMixin extends Screen {
@@ -33,7 +33,7 @@ public abstract class SelectWorldScreenMixin extends Screen {
                 x, y, 22, 22,
                 new WidgetSprites(DownloadPacksButton.UNFOCUSED_RELATIVE, DownloadPacksButton.DISABLED_RELATIVE, DownloadPacksButton.FOCUSED_RELATIVE),
                 (button) -> onPressed((ImageButton) button),
-                Component.translatable(MODID + ".open_tooltip")
+                Component.translatable(MOD_ID + ".open_tooltip")
         );
 
         tButton.setTooltip(Tooltip.create(Component.nullToEmpty("Click here to generate a Textures+ test world")));

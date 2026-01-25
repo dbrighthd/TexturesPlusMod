@@ -1,22 +1,24 @@
-package com.dbrighthd.texturesplusmod.client.pojo; 
-import com.fasterxml.jackson.annotation.JsonProperty; 
-public class Stats{
-    @JsonProperty("total") 
-    public int getTotal() { 
-		 return this.total; } 
-    public void setTotal(int total) { 
-		 this.total = total; } 
-    int total;
-    @JsonProperty("additions") 
-    public int getAdditions() { 
-		 return this.additions; } 
-    public void setAdditions(int additions) { 
-		 this.additions = additions; } 
-    int additions;
-    @JsonProperty("deletions") 
-    public int getDeletions() { 
-		 return this.deletions; } 
-    public void setDeletions(int deletions) { 
-		 this.deletions = deletions; } 
-    int deletions;
+package com.dbrighthd.texturesplusmod.client.pojo;
+
+import com.google.gson.annotations.SerializedName;
+
+public class Stats {
+
+    @SerializedName("total")
+    private int total;
+
+    @SerializedName("additions")
+    private int additions;
+
+    @SerializedName("deletions")
+    private int deletions;
+
+    public int total() { return total; }
+    public void total(int total) { this.total = total; }
+
+    public int additions() { return additions; }
+    public void additions(int additions) { this.additions = additions; }
+
+    public int deletions() { return deletions; }
+    public void deletions(int deletions) { this.deletions = deletions; }
 }

@@ -1,22 +1,24 @@
-package com.dbrighthd.texturesplusmod.client.pojo; 
-import com.fasterxml.jackson.annotation.JsonProperty; 
-public class Parent{
-    @JsonProperty("sha") 
-    public String getSha() { 
-		 return this.sha; } 
-    public void setSha(String sha) { 
-		 this.sha = sha; } 
-    String sha;
-    @JsonProperty("url") 
-    public String getUrl() { 
-		 return this.url; } 
-    public void setUrl(String url) { 
-		 this.url = url; } 
-    String url;
-    @JsonProperty("html_url") 
-    public String getHtml_url() { 
-		 return this.html_url; } 
-    public void setHtml_url(String html_url) { 
-		 this.html_url = html_url; } 
-    String html_url;
+package com.dbrighthd.texturesplusmod.client.pojo;
+
+import com.google.gson.annotations.SerializedName;
+
+public class Parent {
+
+    @SerializedName("sha")
+    private String sha;
+
+    @SerializedName("url")
+    private String url;
+
+    @SerializedName("html_url")
+    private String htmlUrl;
+
+    public String sha() { return sha; }
+    public void sha(String sha) { this.sha = sha; }
+
+    public String url() { return url; }
+    public void url(String url) { this.url = url; }
+
+    public String htmlUrl() { return htmlUrl; }
+    public void htmlUrl(String htmlUrl) { this.htmlUrl = htmlUrl; }
 }

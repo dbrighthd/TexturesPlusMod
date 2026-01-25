@@ -1,8 +1,8 @@
 package com.dbrighthd.texturesplusmod.mixin;
 
 import com.dbrighthd.texturesplusmod.client.TexturesPlusModClient;
-import com.dbrighthd.texturesplusmod.util.PackUtil;
-import com.dbrighthd.texturesplusmod.util.TexturesPlusPackType;
+import com.dbrighthd.texturesplusmod.pack.PackMetadataManager;
+import com.dbrighthd.texturesplusmod.pack.TexturesPlusMetadata;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -35,17 +35,19 @@ public class ResourcePackEntryMixin {
     @Unique private static final Component MODS_ARE_MISSING_MESSAGE = Component.translatable("texturesplusmod.some_mods_are_missing").withStyle(ChatFormatting.GRAY);
     @Unique private static final Component REQUIRED_MODS_ARE_MISSING_MESSAGE = Component.translatable("texturesplusmod.some_required_mods_are_missing").withStyle(ChatFormatting.GRAY);
 
+    @Unique private final PackMetadataManager metadataManager = TexturesPlusModClient.getMetadataManager();
+
     @Inject(method = "renderContent", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/packs/repository/PackCompatibility;isCompatible()Z", ordinal = 0))
     public void renderYellowBackground(GuiGraphics context, int mouseX, int mouseY, boolean hovered, float deltaTicks, CallbackInfo ci) {
-        if (PackUtil.isTexturesPlusPack(pack.getId())) {
-            TexturesPlusPackType type = PackUtil.getPackType(pack.getId());
+        TexturesPlusMetadata metadata = metadataManager.getMetadataForPack(pack.getId());
+        if (metadata != null) {
             int x = ((TransferableSelectionList.PackEntry) (Object) this).getContentX() - 1;
             int y = ((TransferableSelectionList.PackEntry) (Object) this).getContentY() - 1;
             int w = ((TransferableSelectionList.PackEntry) (Object) this).getContentRight() + 1;
             int h = ((TransferableSelectionList.PackEntry) (Object) this).getContentBottom() + 1;
-            if (!PackUtil.areRequiredModsPresentForPackType(type)) {
+            if (!metadata.areRequiredModsPresent()) {
                 context.fill(x, y, w, h, 0xFF770000);
-            } else if (!PackUtil.areOptionalModsPresentForPackType(type)) {
+            } else if (!metadata.areOptionalModsPresent()) {
                 context.fill(x, y, w, h, 0xFF716000);
             }
         }
@@ -53,12 +55,12 @@ public class ResourcePackEntryMixin {
 
     @Inject(method = "renderContent", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/packs/repository/PackCompatibility;isCompatible()Z", ordinal = 1))
     public void renderCompatibilityMessage(GuiGraphics context, int mouseX, int mouseY, boolean hovered, float deltaTicks, CallbackInfo ci) {
-        if (PackUtil.isTexturesPlusPack(pack.getId())) {
-            TexturesPlusPackType type = PackUtil.getPackType(pack.getId());
-            if (!PackUtil.areRequiredModsPresentForPackType(type)) {
+        TexturesPlusMetadata metadata = metadataManager.getMetadataForPack(pack.getId());
+        if (metadata != null) {
+            if (!metadata.areRequiredModsPresent()) {
                 ((TransferableSelectionList.PackEntry) (Object) this).nameWidget.setMessage(TransferableSelectionList.INCOMPATIBLE_TITLE);
                 ((TransferableSelectionList.PackEntry) (Object) this).descriptionWidget.setMessage(REQUIRED_MODS_ARE_MISSING_MESSAGE);
-            } else if (!PackUtil.areOptionalModsPresentForPackType(type)) {
+            } else if (!metadata.areOptionalModsPresent()) {
                 ((TransferableSelectionList.PackEntry) (Object) this).nameWidget.setMessage(SUBOPTIMAL_MESSAGE);
                 ((TransferableSelectionList.PackEntry) (Object) this).descriptionWidget.setMessage(MODS_ARE_MISSING_MESSAGE);
             }
@@ -68,12 +70,12 @@ public class ResourcePackEntryMixin {
     @Inject(method = "renderContent", at = @At(value = "TAIL"))
     public void renderModListTooltip(GuiGraphics context, int mouseX, int mouseY, boolean hovered, float deltaTicks, CallbackInfo ci) {
         if (hovered) {
-            if (PackUtil.isTexturesPlusPack(pack.getId())) {
-                TexturesPlusPackType type = PackUtil.getPackType(pack.getId());
-                if (!PackUtil.areRequiredModsPresentForPackType(type) || !PackUtil.areOptionalModsPresentForPackType(type)) {
+            TexturesPlusMetadata metadata = metadataManager.getMetadataForPack(pack.getId());
+            if (metadata != null) {
+                if (!metadata.areRequiredModsPresent() || !metadata.areOptionalModsPresent()) {
                     Font font = Minecraft.getInstance().font;
-                    String missingRequired = PackUtil.getMissingRequiredMods(pack.getId());
-                    String missingOptional = PackUtil.getMissingOptionalMods(pack.getId());
+                    String missingRequired = metadata.getMissingRequiredMods();
+                    String missingOptional = metadata.getMissingOptionalMods();
                     List<FormattedCharSequence> lines = new ArrayList<>();
 
                     if (!missingRequired.isBlank()) {
@@ -92,6 +94,6 @@ public class ResourcePackEntryMixin {
 
     @Redirect(method = {"renderContent", "handlePackSelection"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/server/packs/repository/PackCompatibility;isCompatible()Z"))
     public boolean redirectIsCompatible(PackCompatibility compatibility) {
-        return compatibility.isCompatible() || (PackUtil.isTexturesPlusPack(pack.getId()) && TexturesPlusModClient.getConfig().ignoreTexturesPlusMcmeta);
+        return compatibility.isCompatible() || (metadataManager.getMetadataForPack(pack.getId()) != null && TexturesPlusModClient.getConfig().ignoreTexturesPlusMcmeta);
     }
 }

@@ -4,7 +4,9 @@
   "version": "${version}",
   "name": "Textures Plus Mod",
   "description": "Updates all 4 Textures+ packs from their github repositories on startup.",
-  "authors": [],
+  "authors": [
+    "dbrighthd", "flamgop"
+  ],
   "contact": {
     "homepage": "https://modrinth.com/mod/textures-plus-mod",
     "sources": "https://github.com/dbrighthd/TexturesPlusMod",
@@ -30,11 +32,11 @@
   "depends": {
     "fabricloader": ">=0.17.2",
     "fabric": "*",
-    "minecraft": "~1.21.11"
+    "minecraft": "~1.21.11",
+    "cloth-config": "*"
   },
   "suggests": {
     "modmenu": "*",
-    "cloth-config": "*",
     "entity_texture_features": "*",
     "entity_model_features": "*",
     "entity_sound_features": "*",

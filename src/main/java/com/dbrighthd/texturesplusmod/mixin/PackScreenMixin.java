@@ -1,6 +1,9 @@
 package com.dbrighthd.texturesplusmod.mixin;
 
+import com.dbrighthd.texturesplusmod.client.TexturesPlusModClient;
 import com.dbrighthd.texturesplusmod.client.screen.DownloadPacksButton;
+import com.dbrighthd.texturesplusmod.pack.PackMetadataManager;
+import net.minecraft.client.gui.screens.packs.PackSelectionModel;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -23,8 +26,20 @@ public abstract class PackScreenMixin extends Screen {
     @Final
     private Path packDir;
 
+    @Shadow
+    @Final
+    private PackSelectionModel model;
+
     protected PackScreenMixin(Component title) {
         super(title);
+    }
+
+    @Inject(method = "reload", at = @At("HEAD"))
+    private void textures$reload(CallbackInfo ci) {
+        TexturesPlusModClient.LOGGER.info("Checking all packs for t+ meta...");
+        PackMetadataManager manager = TexturesPlusModClient.getMetadataManager();
+        this.model.getUnselected().map(PackSelectionModel.Entry::getId).forEach(manager::processPack);
+        this.model.getSelected().map(PackSelectionModel.Entry::getId).forEach(manager::processPack);
     }
 
     @Inject(method = "repositionElements", at = @At("RETURN"))
