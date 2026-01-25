@@ -1,6 +1,7 @@
 package com.dbrighthd.texturesplusmod.client.screen;
 
-import com.dbrighthd.texturesplusmod.PackGetterUtil;
+import com.dbrighthd.texturesplusmod.TexturesPlusMod;
+import com.dbrighthd.texturesplusmod.pack.PackDownloader;
 import com.dbrighthd.texturesplusmod.client.TexturesPlusModClient;
 import java.util.Collection;
 import net.minecraft.client.Minecraft;
@@ -18,17 +19,17 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.repository.PackRepository;
 import org.jspecify.annotations.NonNull;
 
-import static com.dbrighthd.texturesplusmod.TexturesPlusMod.MODID;
+import static com.dbrighthd.texturesplusmod.TexturesPlusMod.MOD_ID;
 
 public class DownloadPacksButton extends AbstractButton {
-    public static final Identifier FOCUSED = Identifier.fromNamespaceAndPath(MODID, "textures/gui/sprites/button_focused.png");
-    public static final Identifier UNFOCUSED = Identifier.fromNamespaceAndPath(MODID, "textures/gui/sprites/button_unfocused.png");
-    public static final Identifier DISABLED = Identifier.fromNamespaceAndPath(MODID, "textures/gui/sprites/button_disabled.png");
-    public static final Identifier LOADING = Identifier.fromNamespaceAndPath(MODID, "textures/gui/sprites/loading.png");
+    public static final Identifier FOCUSED = Identifier.fromNamespaceAndPath(MOD_ID, "textures/gui/sprites/button_focused.png");
+    public static final Identifier UNFOCUSED = Identifier.fromNamespaceAndPath(MOD_ID, "textures/gui/sprites/button_unfocused.png");
+    public static final Identifier DISABLED = Identifier.fromNamespaceAndPath(MOD_ID, "textures/gui/sprites/button_disabled.png");
+    public static final Identifier LOADING = Identifier.fromNamespaceAndPath(MOD_ID, "textures/gui/sprites/loading.png");
 
-    public static final Identifier FOCUSED_RELATIVE = Identifier.fromNamespaceAndPath(MODID, "button_focused");
-    public static final Identifier UNFOCUSED_RELATIVE = Identifier.fromNamespaceAndPath(MODID, "button_unfocused");
-    public static final Identifier DISABLED_RELATIVE = Identifier.fromNamespaceAndPath(MODID, "button_disabled");
+    public static final Identifier FOCUSED_RELATIVE = Identifier.fromNamespaceAndPath(MOD_ID, "button_focused");
+    public static final Identifier UNFOCUSED_RELATIVE = Identifier.fromNamespaceAndPath(MOD_ID, "button_unfocused");
+    public static final Identifier DISABLED_RELATIVE = Identifier.fromNamespaceAndPath(MOD_ID, "button_disabled");
 
     public static void registerTextures(TextureManager textureManager) {
         textureManager.registerForNextReload(FOCUSED);
@@ -57,11 +58,11 @@ public class DownloadPacksButton extends AbstractButton {
         PackRepository resourcePackManager = Minecraft.getInstance().getResourcePackRepository();
         Collection<String> previouslyEnabledPacks = resourcePackManager.getSelectedIds();
 
-        PackGetterUtil.downloadAllPacks(TexturesPlusModClient.getConfig().async).whenComplete(($, err) -> {
+        PackDownloader.downloadAllPacks(TexturesPlusModClient.getConfig().async).whenComplete(($, err) -> {
             this.active = true;
 
-            if (!PackGetterUtil.didAnyUpdate()) {
-                System.out.println("None to update.");
+            if (!PackDownloader.didAnyUpdate()) {
+                TexturesPlusMod.LOGGER.info("None to update.");
                 return;
             }
 

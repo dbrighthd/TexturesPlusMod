@@ -1,70 +1,72 @@
-package com.dbrighthd.texturesplusmod.client.pojo; 
-import com.fasterxml.jackson.annotation.JsonProperty; 
-public class File{
-    @JsonProperty("previous_filename")
-    public String getPreviousFilename() {
-        return this.previous_filename; }
-    public void setPreviousFilename(String previous_filename) {
-        this.previous_filename = previous_filename; }
-    String previous_filename;
-    @JsonProperty("sha") 
-    public String getSha() { 
-		 return this.sha; } 
-    public void setSha(String sha) { 
-		 this.sha = sha; } 
-    String sha;
-    @JsonProperty("filename") 
-    public String getFilename() { 
-		 return this.filename; } 
-    public void setFilename(String filename) { 
-		 this.filename = filename; } 
-    String filename;
-    @JsonProperty("status") 
-    public String getStatus() { 
-		 return this.status; } 
-    public void setStatus(String status) { 
-		 this.status = status; } 
-    String status;
-    @JsonProperty("additions") 
-    public int getAdditions() { 
-		 return this.additions; } 
-    public void setAdditions(int additions) { 
-		 this.additions = additions; } 
-    int additions;
-    @JsonProperty("deletions") 
-    public int getDeletions() { 
-		 return this.deletions; } 
-    public void setDeletions(int deletions) { 
-		 this.deletions = deletions; } 
-    int deletions;
-    @JsonProperty("changes") 
-    public int getChanges() { 
-		 return this.changes; } 
-    public void setChanges(int changes) { 
-		 this.changes = changes; } 
-    int changes;
-    @JsonProperty("blob_url") 
-    public String getBlob_url() { 
-		 return this.blob_url; } 
-    public void setBlob_url(String blob_url) { 
-		 this.blob_url = blob_url; } 
-    String blob_url;
-    @JsonProperty("raw_url") 
-    public String getRaw_url() { 
-		 return this.raw_url; } 
-    public void setRaw_url(String raw_url) { 
-		 this.raw_url = raw_url; } 
-    String raw_url;
-    @JsonProperty("contents_url") 
-    public String getContents_url() { 
-		 return this.contents_url; } 
-    public void setContents_url(String contents_url) { 
-		 this.contents_url = contents_url; } 
-    String contents_url;
-    @JsonProperty("patch") 
-    public String getPatch() { 
-		 return this.patch; } 
-    public void setPatch(String patch) { 
-		 this.patch = patch; } 
-    String patch;
+package com.dbrighthd.texturesplusmod.client.pojo;
+
+import com.google.gson.annotations.SerializedName;
+
+public class File {
+
+    @SerializedName("previous_filename")
+    private String previousFilename;
+
+    @SerializedName("sha")
+    private String sha;
+
+    @SerializedName("filename")
+    private String filename;
+
+    @SerializedName("status")
+    private String status;
+
+    @SerializedName("additions")
+    private int additions;
+
+    @SerializedName("deletions")
+    private int deletions;
+
+    @SerializedName("changes")
+    private int changes;
+
+    @SerializedName("blob_url")
+    private String blobUrl;
+
+    @SerializedName("raw_url")
+    private String rawUrl;
+
+    @SerializedName("contents_url")
+    private String contentsUrl;
+
+    @SerializedName("patch")
+    private String patch;
+
+    public String previousFilename() { return previousFilename; }
+    public void previousFilename(String previousFilename) { this.previousFilename = previousFilename; }
+
+    public String sha() { return sha; }
+    public void sha(String sha) { this.sha = sha; }
+
+    public String filename() { return filename; }
+    public void filename(String filename) { this.filename = filename; }
+
+    public String status() { return status; }
+    public void status(String status) { this.status = status; }
+
+    public int additions() { return additions; }
+    public void additions(int additions) { this.additions = additions; }
+
+    public int deletions() { return deletions; }
+    public void deletions(int deletions) { this.deletions = deletions; }
+
+    public int changes() { return changes; }
+    public void changes(int changes) { this.changes = changes; }
+
+    public String blobUrl() { return blobUrl; }
+    public void blobUrl(String blobUrl) { this.blobUrl = blobUrl; }
+
+    public String rawUrl() { return rawUrl; }
+    public void rawUrl(String rawUrl) { this.rawUrl = rawUrl; }
+
+    public String contentsUrl() { return contentsUrl; }
+    public void contentsUrl(String contentsUrl) { this.contentsUrl = contentsUrl; }
+
+    public String patch() { return patch; }
+    public void patch(String patch) { this.patch = patch; }
 }

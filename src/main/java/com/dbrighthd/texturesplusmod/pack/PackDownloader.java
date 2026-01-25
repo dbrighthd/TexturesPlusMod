@@ -1,7 +1,7 @@
-package com.dbrighthd.texturesplusmod;
+package com.dbrighthd.texturesplusmod.pack;
 
 import com.dbrighthd.texturesplusmod.client.pojo.LatestCommit;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import oshi.util.tuples.Pair;
@@ -21,9 +21,10 @@ import java.util.zip.ZipFile;
 
 import static com.dbrighthd.texturesplusmod.TexturesPlusMod.LOGGER;
 
-public class PackGetterUtil {
+public class PackDownloader {
 
     private static final ExecutorService POOL = Executors.newVirtualThreadPerTaskExecutor();
+    private static final Gson GSON = new Gson();
 
     public static void downloadFile(URL url, String fileName) throws Exception { // this is left alone, it's fine as is.
         try (InputStream in = url.openStream()) {
@@ -73,11 +74,11 @@ public class PackGetterUtil {
             int status = con.getResponseCode();
             if (status != 200) {
                 LOGGER.error("Failed to download pack {} from {}, status: {}", pack, url, status);
-                throw new java.io.IOException("Status Code = " + status + " != 200");
+                throw new IOException("Status Code = " + status + " != 200");
             }
 
             byte[] bytes = con.getInputStream().readAllBytes();
-            commit = new ObjectMapper().readValue(bytes, LatestCommit.class);
+            commit = GSON.fromJson(new String(bytes, StandardCharsets.UTF_8), LatestCommit.class);
 
             con.disconnect();
             File oldPackCommit = new File("resourcepacks/" + pack + "plus/commit_hash.txt");
@@ -86,7 +87,7 @@ public class PackGetterUtil {
                     BufferedReader brTest = new BufferedReader(new FileReader(oldPackCommit));
                     String currentHash = brTest.readLine();
                     brTest.close();
-                    if (currentHash.equals(commit.getSha())) {
+                    if (currentHash.equals(commit.sha())) {
                         LOGGER.info("{}+ is already up to date!", pack);
                         return new Pair<>(pathToPack.toAbsolutePath().toString(), false);
                     }
@@ -120,7 +121,7 @@ public class PackGetterUtil {
             FileUtils.deleteDirectory(new File("resourcepacks/" + pack + "temp"));
             FileUtils.delete(new File("resourcepacks/" + pack + "temp.zip"));
             PrintWriter writer = new PrintWriter("resourcepacks/" + pack + "plus/" + "commit_hash.txt", StandardCharsets.UTF_8);
-            writer.println(commit.getSha());
+            writer.println(commit.sha());
             writer.close();
             LOGGER.info("Finished downloading and extracting {}+!", pack);
             return new Pair<>(pathToPack.toAbsolutePath().toString(), true);

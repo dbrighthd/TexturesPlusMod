@@ -1,4 +1,4 @@
-package com.dbrighthd.texturesplusmod.datapackutil;
+package com.dbrighthd.texturesplusmod.datapack;
 
 public record TexturesPlusEntityNbt(String nbt, String rawnbt, String rename) {
 }
