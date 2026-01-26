@@ -80,10 +80,10 @@ public abstract class PackScreenMixin extends Screen {
                         CompletableFuture<Pair<String, Boolean>> pumpkins = PackDownloader.downloadResourcePack("pumpkins", !async);
                         CompletableFuture<Pair<String, Boolean>> weapons = PackDownloader.downloadResourcePack("weapons", !async);
                         CompletableFuture<Pair<String, Boolean>> creatures = PackDownloader.downloadResourcePack("creatures", !async);
-                        elytras = elytras.whenComplete((p,t) -> {if (p.getB()) anyUpdated.set(true); System.out.println("updated elytras " + p.getB());});
-                        pumpkins = pumpkins.whenComplete((p,t) -> {if (p.getB()) anyUpdated.set(true); System.out.println("updated pumpkins " + p.getB());});
-                        weapons = weapons.whenComplete((p,t) -> {if (p.getB()) anyUpdated.set(true); System.out.println("updated weapons " + p.getB());});
-                        creatures = creatures.whenComplete((p,t) -> {if (p.getB()) anyUpdated.set(true); System.out.println("updated creatures " + p.getB());});
+                        elytras = elytras.whenComplete((p,t) -> {if (p.getB()) anyUpdated.set(true);});
+                        pumpkins = pumpkins.whenComplete((p,t) -> {if (p.getB()) anyUpdated.set(true);});
+                        weapons = weapons.whenComplete((p,t) -> {if (p.getB()) anyUpdated.set(true);});
+                        creatures = creatures.whenComplete((p,t) -> {if (p.getB()) anyUpdated.set(true);});
                         return CompletableFuture.allOf(elytras, pumpkins, weapons, creatures);
                     }, ($) -> {
                         if (!anyUpdated.get()) {
