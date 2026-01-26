@@ -1,27 +1,23 @@
 package com.dbrighthd.texturesplusmod.client.screen;
 
-import com.dbrighthd.texturesplusmod.TexturesPlusMod;
-import com.dbrighthd.texturesplusmod.pack.PackDownloader;
-import com.dbrighthd.texturesplusmod.client.TexturesPlusModClient;
-import java.util.Collection;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
-import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.minecraft.server.packs.repository.PackRepository;
 import org.jspecify.annotations.NonNull;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import static com.dbrighthd.texturesplusmod.TexturesPlusMod.MOD_ID;
 
-public class DownloadPacksButton extends AbstractButton {
+public class AsyncTexturesPlusButton<T> extends AbstractButton {
     public static final Identifier FOCUSED = Identifier.fromNamespaceAndPath(MOD_ID, "textures/gui/sprites/button_focused.png");
     public static final Identifier UNFOCUSED = Identifier.fromNamespaceAndPath(MOD_ID, "textures/gui/sprites/button_unfocused.png");
     public static final Identifier DISABLED = Identifier.fromNamespaceAndPath(MOD_ID, "textures/gui/sprites/button_disabled.png");
@@ -38,52 +34,28 @@ public class DownloadPacksButton extends AbstractButton {
         textureManager.registerForNextReload(LOADING);
     }
 
-    private final Screen screen;
-
     private int tick = 0;
     private int cooldownTicks = 0;
     private float deltaAccumulator = 0;
 
-    public DownloadPacksButton(Screen screen, int x, int y, int width, int height) {
-        super(x, y, width, height, Component.translatable("texturesplusmod.open_tooltip"));
-        this.screen = screen;
-        this.setTooltip(Tooltip.create(net.minecraft.network.chat.Component.nullToEmpty("Click here to update Textures+ resource packs.")));
+    private final Component narration;
+    private final Supplier<CompletableFuture<T>> onPress;
+    private final Consumer<T> whenComplete;
+
+    public AsyncTexturesPlusButton(int x, int y, int width, int height, Component inactiveTooltip, Component narration, Supplier<CompletableFuture<T>> onPress, Consumer<T> whenComplete) {
+        super(x, y, width, height, inactiveTooltip);
+        this.narration = narration;
+        this.onPress = onPress;
+        this.whenComplete = whenComplete;
     }
 
     @Override
     public void onPress(@NonNull InputWithModifiers input) {
         this.setFocused(false);
         this.active = false;
-
-        PackRepository resourcePackManager = Minecraft.getInstance().getResourcePackRepository();
-        Collection<String> previouslyEnabledPacks = resourcePackManager.getSelectedIds();
-
-        PackDownloader.downloadAllPacks(TexturesPlusModClient.getConfig().async).whenComplete(($, err) -> {
+        this.onPress.get().whenComplete((t, err) -> {
             this.active = true;
-
-            if (!PackDownloader.didAnyUpdate()) {
-                TexturesPlusMod.LOGGER.info("None to update.");
-                return;
-            }
-
-            if (TexturesPlusModClient.getConfig().async) {
-                TexturesPlusModClient.queueOnMainThread(() -> {
-                    Screen screenToReturnTo = Minecraft.getInstance().screen;
-                    Minecraft.getInstance().setScreen(new ReloadPrompt((confirmed) -> {
-                        if (!confirmed) return;
-
-                        if (Minecraft.getInstance().screen == screenToReturnTo) screen.onClose();
-
-                        // keep packs enabled, then rescan
-                        resourcePackManager.setSelected(previouslyEnabledPacks);
-                        resourcePackManager.reload();
-
-                        if (Minecraft.getInstance().screen != screenToReturnTo) {
-                            Minecraft.getInstance().setScreen(screenToReturnTo);
-                        }
-                    }, false));
-                });
-            }
+            whenComplete.accept(t);
         });
     }
 
@@ -108,6 +80,6 @@ public class DownloadPacksButton extends AbstractButton {
 
     @Override
     protected void updateWidgetNarration(NarrationElementOutput builder) {
-        builder.add(NarratedElementType.USAGE, Component.translatable("texturesplusmod.open_tooltip"));
+        builder.add(NarratedElementType.USAGE, narration);
     }
 }

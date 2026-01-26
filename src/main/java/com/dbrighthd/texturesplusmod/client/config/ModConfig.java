@@ -24,4 +24,6 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Gui.Tooltip(count = 3)
     public boolean devMode = false;
+
+    public String githubApiKey = "";
 }

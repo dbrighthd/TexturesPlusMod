@@ -28,5 +28,7 @@
   "texturesplusmod.open_tooltip": "Check for updates to Textures+ packs",
   "texturesplusmod.suboptimal": "Suboptimal",
   "texturesplusmod.some_required_mods_are_missing": "(You're missing required mods, this pack won't work right)",
-  "texturesplusmod.some_mods_are_missing": "(Some mods are missing, your experience may be impacted)"
+  "texturesplusmod.some_mods_are_missing": "(Some mods are missing, your experience may be impacted)",
+  "texturesplusmod.missing_mods_required": "Missing (Required) Mods: %s",
+  "texturesplusmod.missing_mods_optional": "Missing (Optional) Mods: %s"
 }
