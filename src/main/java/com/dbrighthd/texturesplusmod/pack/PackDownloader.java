@@ -1,5 +1,6 @@
 package com.dbrighthd.texturesplusmod.pack;
 
+import com.dbrighthd.texturesplusmod.client.TexturesPlusModClient;
 import com.dbrighthd.texturesplusmod.client.pojo.LatestCommit;
 import com.google.gson.Gson;
 import org.apache.commons.io.FileUtils;
@@ -26,9 +27,17 @@ public class PackDownloader {
     private static final ExecutorService POOL = Executors.newVirtualThreadPerTaskExecutor();
     private static final Gson GSON = new Gson();
 
-    public static void downloadFile(URL url, String fileName) throws Exception { // this is left alone, it's fine as is.
-        try (InputStream in = url.openStream()) {
+    public static void downloadFile(URL url, String fileName) throws Exception {
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        String apiKey = TexturesPlusModClient.getConfig().githubApiKey;
+        if (!apiKey.isBlank()) {
+            con.setRequestProperty("Authorization", "Bearer " + apiKey);
+        }
+
+        try (InputStream in = con.getInputStream()) {
             Files.copy(in, Paths.get(fileName), StandardCopyOption.REPLACE_EXISTING);
+        } finally {
+            con.disconnect();
         }
     }
 
@@ -71,6 +80,11 @@ public class PackDownloader {
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
             con.setRequestProperty("Content-Type", "application/json");
+            String apiKey = TexturesPlusModClient.getConfig().githubApiKey;
+            if (!apiKey.isBlank()) {
+                con.setRequestProperty("Authorization", "Bearer " + apiKey);
+            }
+
             int status = con.getResponseCode();
             if (status != 200) {
                 LOGGER.error("Failed to download pack {} from {}, status: {}", pack, url, status);
@@ -159,32 +173,12 @@ public class PackDownloader {
         return future;
     }
 
-    private static boolean didElytrasUpdate = false;
-    private static boolean didPumpkinsUpdate = false;
-    private static boolean didWeaponsUpdate = false;
-    private static boolean didCreaturesUpdate = false;
-
-    public static boolean didAnyUpdate() {
-        return didElytrasUpdate || didWeaponsUpdate || didPumpkinsUpdate || didCreaturesUpdate;
-    }
 
     public static CompletableFuture<Void> downloadAllPacks(boolean async) {
         CompletableFuture<Pair<String, Boolean>> elytras = downloadResourcePack("elytras", !async);
         CompletableFuture<Pair<String, Boolean>> pumpkins = downloadResourcePack("pumpkins", !async);
         CompletableFuture<Pair<String, Boolean>> weapons = downloadResourcePack("weapons", !async);
         CompletableFuture<Pair<String, Boolean>> creatures = downloadResourcePack("creatures", !async);
-        elytras.whenComplete((s, e) ->
-            didElytrasUpdate = s.getB()
-        );
-        pumpkins.whenComplete((s, e) ->
-            didPumpkinsUpdate = s.getB()
-        );
-        weapons.whenComplete((s, e) ->
-            didWeaponsUpdate = s.getB()
-        );
-        creatures.whenComplete((s, e) ->
-            didCreaturesUpdate = s.getB()
-        );
         return CompletableFuture.allOf(elytras, pumpkins, weapons, creatures);
     }
 

@@ -11,7 +11,6 @@ import net.minecraft.client.gui.screens.inventory.tooltip.BelowOrAboveWidgetTool
 import net.minecraft.client.gui.screens.packs.PackSelectionModel;
 import net.minecraft.client.gui.screens.packs.TransferableSelectionList;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FormattedText;
 import net.minecraft.server.packs.repository.PackCompatibility;
 import net.minecraft.util.FormattedCharSequence;
 import org.spongepowered.asm.mixin.Final;
@@ -79,11 +78,13 @@ public class ResourcePackEntryMixin {
                     List<FormattedCharSequence> lines = new ArrayList<>();
 
                     if (!missingRequired.isBlank()) {
-                        List<FormattedCharSequence> requiredLines = font.split(FormattedText.of("Missing (Required) Mods: " + missingRequired), ((TransferableSelectionList.PackEntry) (Object) this).getContentWidth());
+                        Component missingRequiredMods = Component.translatable("texturesplusmod.missing_mods_required", missingRequired);
+                        List<FormattedCharSequence> requiredLines = font.split(missingRequiredMods, ((TransferableSelectionList.PackEntry) (Object) this).getContentWidth());
                         lines.addAll(requiredLines);
                     }
                     if (!missingOptional.isBlank()) {
-                        List<FormattedCharSequence> optionalLines = font.split(FormattedText.of("Missing (Optional) Mods: " + missingOptional), ((TransferableSelectionList.PackEntry) (Object) this).getContentWidth());
+                        Component missingOptionalMods = Component.translatable("texturesplusmod.missing_mods_optional", missingOptional);
+                        List<FormattedCharSequence> optionalLines = font.split(missingOptionalMods, ((TransferableSelectionList.PackEntry) (Object) this).getContentWidth());
                         lines.addAll(optionalLines);
                     }
                     context.setTooltipForNextFrame(font, lines, new BelowOrAboveWidgetTooltipPositioner(((TransferableSelectionList.PackEntry) (Object) this).getRectangle()), mouseX, mouseY, true);

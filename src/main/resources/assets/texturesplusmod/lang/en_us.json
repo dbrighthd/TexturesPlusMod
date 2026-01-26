@@ -1,32 +1,37 @@
 {
   "text.autoconfig.texturesplusmod.title": "Textures+ Mod Settings",
   "text.autoconfig.texturesplusmod.option.async": "Async",
-  "text.autoconfig.texturesplusmod.option.async.@Tooltip[0]": "[BETA] Enables asynchronous downloading.",
+  "text.autoconfig.texturesplusmod.option.async.@Tooltip[0]": "Enables asynchronous downloading.",
   "text.autoconfig.texturesplusmod.option.async.@Tooltip[1]": "Prevents the downloading button from freezing minecraft,",
-  "text.autoconfig.texturesplusmod.option.async.@Tooltip[2]": "creates issues with resourcepacks disabling themselves",
-  "text.autoconfig.texturesplusmod.option.async.@Tooltip[3]": "on launch",
   "text.autoconfig.texturesplusmod.option.updatePacksOnStartup": "Update Packs On Startup",
 
   "text.autoconfig.texturesplusmod.option.mergeEntities": "Simplify Entities",
   "text.autoconfig.texturesplusmod.option.mergeEntities.@Tooltip": "Hide some variants of entities (Angry dogs/bees)",
-
 
   "text.autoconfig.texturesplusmod.option.sortAlphabetically": "Sort Entities Alphabetically",
   "text.autoconfig.texturesplusmod.option.sortAlphabetically.@Tooltip": "If false, sorts by number of entities",
 
   "text.autoconfig.texturesplusmod.option.devMode": "Dev Mode for World",
   "text.autoconfig.texturesplusmod.option.devMode.@Tooltip[0]": "DO NOT ENABLE IF YOU DO NOT KNOW WHAT THIS MEANS.",
-  "text.autoconfig.texturesplusmod.option.devMode.@Tooltip[1]": "Generates world from local cloned repository in resourcepack folder",
+  "text.autoconfig.texturesplusmod.option.devMode.@Tooltip[1]": "Generates world from local cloned repository in resource pack folder",
   "text.autoconfig.texturesplusmod.option.devMode.@Tooltip[2]": "instead of the one downloaded from the mod.",
 
   "text.autoconfig.texturesplusmod.option.elytraArmorStands": "Elytra Armor Stands for World",
   "text.autoconfig.texturesplusmod.option.elytraArmorStands.@Tooltip": "Generate armor stand with every elytra in the generated world (LAGGY)",
 
   "text.autoconfig.texturesplusmod.option.ignoreTexturesPlusMcmeta": "Ignore Textures+ Mcmeta Version",
+
+  "text.autoconfig.texturesplusmod.option.githubApiKey": "GitHub Access Token",
+  "text.autoconfig.texturesplusmod.option.githubApiKey.@Tooltip[0]": "A GitHub fine-grained personal access token.",
+  "text.autoconfig.texturesplusmod.option.githubApiKey.@Tooltip[1]": "Use this if you're getting rate-limited from downloading packs too often.",
+  "text.autoconfig.texturesplusmod.option.githubApiKey.@Tooltip[2]": "See https://github.com/settings/personal-access-tokens to create one.",
+
   "texturesplusmod.reload": "Reload",
   "texturesplusmod.reload.text": "A Resource Pack reload is required to apply the newly-downloaded Textures+ packs, reload now?",
   "texturesplusmod.open_tooltip": "Check for updates to Textures+ packs",
   "texturesplusmod.suboptimal": "Suboptimal",
   "texturesplusmod.some_required_mods_are_missing": "(You're missing required mods, this pack won't work right)",
-  "texturesplusmod.some_mods_are_missing": "(Some mods are missing, your experience may be impacted)"
+  "texturesplusmod.some_mods_are_missing": "(Some mods are missing, your experience may be impacted)",
+  "texturesplusmod.missing_mods_required": "Missing (Required) Mods: %s",
+  "texturesplusmod.missing_mods_optional": "Missing (Optional) Mods: %s"
 }

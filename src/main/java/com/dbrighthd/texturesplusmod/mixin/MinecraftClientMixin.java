@@ -1,6 +1,6 @@
 package com.dbrighthd.texturesplusmod.mixin;
 
-import com.dbrighthd.texturesplusmod.client.screen.DownloadPacksButton;
+import com.dbrighthd.texturesplusmod.client.screen.AsyncTexturesPlusButton;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.main.GameConfig;
 import net.minecraft.client.renderer.texture.TextureManager;
@@ -20,6 +20,6 @@ public class MinecraftClientMixin {
     // this is a hack so we don't load textures when we're not supposed to lol
     @Inject(method = "<init>", at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/client/gui/screens/TitleScreen;registerTextures(Lnet/minecraft/client/renderer/texture/TextureManager;)V"))
     public void textures$registerTextures(GameConfig args, CallbackInfo ci) {
-        DownloadPacksButton.registerTextures(textureManager);
+        AsyncTexturesPlusButton.registerTextures(textureManager);
     }
 }
