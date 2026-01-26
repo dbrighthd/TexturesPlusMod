@@ -22,9 +22,9 @@
   "text.autoconfig.texturesplusmod.option.ignoreTexturesPlusMcmeta": "Ignore Textures+ Mcmeta Version",
 
   "text.autoconfig.texturesplusmod.option.githubApiKey": "GitHub Access Token",
-  "text.autoconfig.texturesplusmod.option.@Tooltip[0]": "A GitHub fine-grained personal access token.",
-  "text.autoconfig.texturesplusmod.option.@Tooltip[1]": "Use this if you're getting rate-limited from downloading packs too often.",
-  "text.autoconfig.texturesplusmod.option.@Tooltip[2]": "See https://github.com/settings/personal-access-tokens to create one.",
+  "text.autoconfig.texturesplusmod.option.githubApiKey.@Tooltip[0]": "A GitHub fine-grained personal access token.",
+  "text.autoconfig.texturesplusmod.option.githubApiKey.@Tooltip[1]": "Use this if you're getting rate-limited from downloading packs too often.",
+  "text.autoconfig.texturesplusmod.option.githubApiKey.@Tooltip[2]": "See https://github.com/settings/personal-access-tokens to create one.",
 
   "texturesplusmod.reload": "Reload",
   "texturesplusmod.reload.text": "A Resource Pack reload is required to apply the newly-downloaded Textures+ packs, reload now?",
