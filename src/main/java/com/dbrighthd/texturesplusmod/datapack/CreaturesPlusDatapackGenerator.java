@@ -349,9 +349,8 @@ public class CreaturesPlusDatapackGenerator {
         String nbtString = "";
         String rawNbtString = "";
         String entityType = propName;
-
         if (cemTexturePaths.containsKey(propName + ".png")) {
-            entityType = cemTexturePaths.get(propName + ".png").replaceAll("\\d+", "").replace(".jem", "");
+            propName = entityType = cemTexturePaths.get(propName + ".png").replaceAll("\\d+", "").replace(".jem", "");
             if (entityType.contains("baby") || entityType.contains("saddle") || entityType.contains("boat")) return null;
         }
 
@@ -368,13 +367,27 @@ public class CreaturesPlusDatapackGenerator {
             rawNbtString = formatNbt("variant", variant, rawNbtSlash);
 
         }
-        if (propName.equals("snow_fox")) {
+        else if(propName.contains("tropical"))
+        {
+            int variant = 50855936;
+            if (propName.contains("tropical_a"))
+            {
+                variant = selectVariant(propName, Map.of("tropical_a_pattern_1", 50855936, "tropical_a_pattern_2",50856192, "tropical_a_pattern_3",50856448, "tropical_a_pattern_4", 50856704,"tropical_a_pattern_5",50856960, "tropical_a_pattern_6",50857216));
+            }
+            if (propName.contains("tropical_b"))
+            {
+                variant =  selectVariant(propName, Map.of("tropical_b_pattern_1",50855937,"tropical_b_pattern_2",50856193,"tropical_b_pattern_3",50856449, "tropical_b_pattern_4", 50856705, "tropical_b_pattern_5",50856961, "tropical_b_pattern_6", 50857217));
+            }
+            entityType = "tropical_fish";
+            nbtString = rawNbtString = "Variant:" + variant;
+        }
+        else if (propName.equals("snow_fox")) {
             entityType = "fox";
             nbtString = formatNbt("Type", "snow", nbtSlash);
             rawNbtString = formatNbt("Type", "snow", rawNbtSlash);
 
         }
-        if (propName.endsWith("panda")) {
+        else if (propName.endsWith("panda")) {
             entityType = "panda";
             String gene = propName.replace("_panda", "");
             if(gene.equals("panda"))
@@ -445,7 +458,7 @@ public class CreaturesPlusDatapackGenerator {
             int variant = selectVariant(propName, Map.of("white", 1, "brown", 2, "gray", 3));
             nbtString = rawNbtString = "Variant:" + variant;
 
-        } else if (propName.endsWith("_chicken")) {
+        } else if (propName.endsWith("chicken")) {
             entityType = "chicken";
             String variant = propName.replace("_chicken", "");
             nbtString = formatNbt("variant", variant, nbtSlash);
@@ -545,7 +558,6 @@ public class CreaturesPlusDatapackGenerator {
 
         return new TexturesPlusEntity(nbtList, entityType);
     }
-
     private static String formatNbt(String key, String value, String slash) {
         return key + ":" + slash + "\"" + value + slash + "\"";
     }
