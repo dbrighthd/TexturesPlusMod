@@ -12,6 +12,9 @@ public class ModConfig implements ConfigData {
     public boolean updatePacksOnStartup = true;
 
     @ConfigEntry.Gui.Tooltip
+    public boolean cullArmor = true;
+    
+    @ConfigEntry.Gui.Tooltip
     public boolean showElytraArmorStands = true;
 
     @ConfigEntry.Gui.Tooltip
@@ -28,8 +31,6 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Gui.Tooltip
     public boolean lastPos = false;
 
-    @ConfigEntry.Gui.Tooltip
-    public boolean cullArmor = true;
 
     @ConfigEntry.Gui.Tooltip(count = 3)
     public String githubApiKey = "";
