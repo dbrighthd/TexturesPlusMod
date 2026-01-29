@@ -1,5 +1,6 @@
 package com.dbrighthd.texturesplusmod;
 
+import com.dbrighthd.texturesplusmod.client.TexturesPlusModClient;
 import com.dbrighthd.texturesplusmod.datapack.*;
 import java.io.*;
 import java.nio.file.Files;
@@ -37,7 +38,36 @@ public class TexturesPlusWorldGenerator {
 
     public static void generateWorld() throws IOException, InterruptedException {
         LOGGER.info("Generating Textures+ test world...");
-        File worldDir = Paths.get(Minecraft.getInstance().gameDirectory.getPath(), "saves", "TexturesPlusGenerated").toFile();
+
+        File worldDir = new File(
+                Minecraft.getInstance().gameDirectory,
+                "saves/TexturesPlusGenerated"
+        );
+
+        File LevelDatCurr = new File(worldDir, "level.dat");
+        File levelDatOld = new File(worldDir, "level.dat_old");
+
+        File backupDir = new File(
+                Minecraft.getInstance().gameDirectory,
+                "texturesplus_backups"
+        );
+        backupDir.mkdirs();
+
+        File backupLevelDat = new File(backupDir, "TexturesPlusGenerated_level.dat.bak");
+        File backupLevelDatOld = new File(backupDir, "TexturesPlusGenerated_level.dat_old.bak");
+
+        boolean restoreLastPos = TexturesPlusModClient.getConfig().lastPos;
+
+        // Backup old world dat, for storing last position.
+        if (restoreLastPos && LevelDatCurr.exists()) {
+            FileUtils.copyFile(LevelDatCurr, backupLevelDat);
+            LOGGER.info("Backed up level.dat");
+
+            if (levelDatOld.exists()) {
+                FileUtils.copyFile(levelDatOld, backupLevelDatOld);
+            }
+        }
+
         if (worldDir.exists()) {
             FileUtils.deleteDirectory(worldDir);
         }
@@ -48,7 +78,14 @@ public class TexturesPlusWorldGenerator {
             }
             Files.copy(in, tempZip, StandardCopyOption.REPLACE_EXISTING);
             unzipWorldFileToSaves(tempZip, "TexturesPlusGenerated");  // unzip into the saves directory
+            if (restoreLastPos && backupLevelDat.exists()) {
+                FileUtils.copyFile(backupLevelDat, LevelDatCurr);
+                LOGGER.info("Restored level.dat");
 
+                if (backupLevelDatOld.exists()) {
+                    FileUtils.copyFile(backupLevelDatOld, levelDatOld);
+                }
+            }
             Path levelDat = worldDir.toPath().resolve("level.dat");
             if (Files.exists(levelDat)) {
                 try {

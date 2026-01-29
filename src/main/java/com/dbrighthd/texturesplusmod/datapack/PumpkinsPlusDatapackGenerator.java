@@ -22,8 +22,7 @@ import static com.dbrighthd.texturesplusmod.TexturesPlusMod.LOGGER;
 public class PumpkinsPlusDatapackGenerator {
     public static void generatePumpkinsMcfunction() throws IOException {
         LOGGER.info("Generating Pumpkins+ placement in world...");
-        // Path to your JSON file
-        String pumpkinPath = "pumpkinsplus";
+            String pumpkinPath = "pumpkinsplus";
         if(TexturesPlusModClient.getConfig().devMode)
         {
             pumpkinPath = "pumpkins";

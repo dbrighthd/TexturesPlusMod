@@ -4,6 +4,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -48,6 +50,44 @@ public class TexturesPlusDatapackGeneralUtil {
         return result;
     }
 
+    static <T> Map<String, T> parseKeyValueFromLines(Function<String, T> mapper, Stream<String> lines) {
+        Map<String, T> map = new HashMap<>();
+        lines.map(String::trim)
+                .filter(line -> line.contains(","))
+                .forEach(line -> {
+                    String[] parts = line.split(",", 2);
+                    if (parts.length == 2) {
+                        String key = parts[0].trim();
+                        T value = mapper.apply(parts[1].trim());
+                        if (value == null) return; // don't populate garbage values
+                        map.put(key, value);
+                    }
+                });
+        return map;
+    }
+
+    static <T> void addAllElementsToListOfList(List<List<T>> destinationListOfList, List<T> sourceList, int groupSize)
+    {
+        for (int i = 0; i < sourceList.size(); i += groupSize) {
+            destinationListOfList.add(new ArrayList<>(sourceList.subList(i, Math.min(i + groupSize, sourceList.size()))));
+        }
+    }
+
+    static <T> Map<String, T> parseKeyValueFromLinesOrdered(Function<String, T> mapper, Stream<String> lines) {
+        Map<String, T> map = new LinkedHashMap<>();
+        lines.map(String::trim)
+                .filter(line -> line.contains(","))
+                .forEach(line -> {
+                    String[] parts = line.split(",", 2);
+                    if (parts.length == 2) {
+                        String key = parts[0].trim();
+                        T value = mapper.apply(parts[1].trim());
+                        if (value == null) return; // don't populate garbage values
+                        map.put(key, value);
+                    }
+                });
+        return map;
+    }
     public static String getFirstRegexMatch(String pattern) {
 
         String lower = pattern.toLowerCase(Locale.ROOT);

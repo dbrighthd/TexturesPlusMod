@@ -21,7 +21,6 @@ import static com.dbrighthd.texturesplusmod.TexturesPlusMod.LOGGER;
 public class ElytrasPlusDatapackGenerator {
     public static void generateElytrasMcfunction() throws IOException {
         LOGGER.info("Generating Elytras+ placement in world...");
-        // Path to your JSON file
         String elytraPath = "elytrasplus";
         if(TexturesPlusModClient.getConfig().devMode)
         {
@@ -117,7 +116,7 @@ public class ElytrasPlusDatapackGenerator {
         Collections.sort(cape);
 
         String append = "";
-        if(!TexturesPlusModClient.getConfig().elytraArmorStands)
+        if(!TexturesPlusModClient.getConfig().showElytraArmorStands)
         {
             append = "noarmor";
         }

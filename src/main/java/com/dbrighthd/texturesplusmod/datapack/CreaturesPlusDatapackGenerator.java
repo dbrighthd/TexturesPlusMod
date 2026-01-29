@@ -18,6 +18,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 
 import static com.dbrighthd.texturesplusmod.TexturesPlusMod.LOGGER;
+import static com.dbrighthd.texturesplusmod.datapack.TexturesPlusDatapackGeneralUtil.parseKeyValueFromLines;
 
 public class CreaturesPlusDatapackGenerator {
     public static Set<String> parsedEntities;
@@ -40,7 +41,6 @@ public class CreaturesPlusDatapackGenerator {
 
     public static void generateCreaturesMcfunction() throws IOException {
         LOGGER.info("Generating Creatures+ placement in world...");
-        // Path to your JSON file
         String creaturesPath = "creaturesplus";
         if (TexturesPlusModClient.getConfig().devMode) {
             creaturesPath = "creatures";
@@ -619,21 +619,7 @@ public class CreaturesPlusDatapackGenerator {
         return output;
     }
 
-    private static <T> Map<String, T> parseKeyValueFromLines(Function<String, T> mapper, Stream<String> lines) {
-        Map<String, T> map = new HashMap<>();
-        lines.map(String::trim)
-                .filter(line -> line.contains(","))
-                .forEach(line -> {
-                    String[] parts = line.split(",", 2);
-                    if (parts.length == 2) {
-                        String key = parts[0].trim();
-                        T value = mapper.apply(parts[1].trim());
-                        if (value == null) return; // don't populate garbage values
-                        map.put(key, value);
-                    }
-                });
-        return map;
-    }
+
 
     public static Map<String, Integer> getEntityIncrements() {
         String creaturesPath = "creaturesplus";

@@ -16,10 +16,16 @@
   "text.autoconfig.texturesplusmod.option.devMode.@Tooltip[1]": "Generates world from local cloned repository in resource pack folder",
   "text.autoconfig.texturesplusmod.option.devMode.@Tooltip[2]": "instead of the one downloaded from the mod.",
 
-  "text.autoconfig.texturesplusmod.option.elytraArmorStands": "Elytra Armor Stands for World",
-  "text.autoconfig.texturesplusmod.option.elytraArmorStands.@Tooltip": "Generate armor stand with every elytra in the generated world (LAGGY)",
+  "text.autoconfig.texturesplusmod.option.lastPos": "Store Last Position in World",
+  "text.autoconfig.texturesplusmod.option.lastPos.@Tooltip": "Copies last position & inventory",
+
+  "text.autoconfig.texturesplusmod.option.showElytraArmorStands": "Elytra Armor Stands for World",
+  "text.autoconfig.texturesplusmod.option.showElytraArmorStands.@Tooltip": "Generate armor stand with every elytra in the generated world (LAGGY IF CULLING IS DISABLED)",
 
   "text.autoconfig.texturesplusmod.option.ignoreTexturesPlusMcmeta": "Ignore Textures+ Mcmeta Version",
+
+  "text.autoconfig.texturesplusmod.option.cullArmor": "Armor Stand Culling",
+  "text.autoconfig.texturesplusmod.option.cullArmor.@Tooltip": "Armor stands only render in T+ world when you are near them. Helps with lag.",
 
   "text.autoconfig.texturesplusmod.option.githubApiKey": "GitHub Access Token",
   "text.autoconfig.texturesplusmod.option.githubApiKey.@Tooltip[0]": "A GitHub fine-grained personal access token.",
