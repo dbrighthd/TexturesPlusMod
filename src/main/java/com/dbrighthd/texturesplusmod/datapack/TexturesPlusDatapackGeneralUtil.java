@@ -175,7 +175,7 @@ public class TexturesPlusDatapackGeneralUtil {
 
         String firstWhen = null;
         JsonElement whenNode = currCase.get("when");
-        if (whenNode != null) {
+        if (whenNode != null  ) {
             if (whenNode.isJsonArray() && !whenNode.getAsJsonArray().isEmpty()) {
                 firstWhen = whenNode.getAsJsonArray().get(0).getAsString();
             } else if (whenNode.isJsonPrimitive()) {
@@ -198,7 +198,7 @@ public class TexturesPlusDatapackGeneralUtil {
     public static List<TexturesPlusItem> getConditionsRecur(List<String> enchants, JsonObject node, String itemType, String firstWhen, int damage) {
         List<TexturesPlusItem> foundItems = new ArrayList<>();
         try {
-            String type = node.has("type") ? node.get("type").getAsString() : "";
+                String type = node.has("type") ? node.get("type").getAsString() : "";
 
             if (type.contains("model")) {
                 foundItems.add(new TexturesPlusItem(new ArrayList<>(enchants), firstWhen, damage, itemType, node.get("model").getAsString()));
@@ -254,22 +254,27 @@ public class TexturesPlusDatapackGeneralUtil {
                 String property = node.has("property") ? node.get("property").getAsString() : "";
                 boolean isGui = property.contains("display_context");
                 boolean isDamage = node.has("component") && node.get("component").getAsString().contains("damage");
+                boolean isTrim = property.contains("trim");
+                if(isTrim)
+                {
+                    foundItems.add(getConditionsRecur(enchants, node.getAsJsonObject("fallback"), itemType, firstWhen, 0).getFirst());
+                }
+                else {
+                    for (JsonElement caseElement : cases) {
+                        JsonObject caseNode = caseElement.getAsJsonObject();
+                        int damageNode = 0;
+                        if (isDamage && caseNode.has("when")) {
+                            JsonElement when = caseNode.get("when");
+                            damageNode = when.isJsonArray() ? when.getAsJsonArray().get(0).getAsInt() : when.getAsInt();
+                        }
 
-                for (JsonElement caseElement : cases) {
-                    JsonObject caseNode = caseElement.getAsJsonObject();
-                    int damageNode = 0;
-                    if (isDamage && caseNode.has("when")) {
-                        JsonElement when = caseNode.get("when");
-                        damageNode = when.isJsonArray() ? when.getAsJsonArray().get(0).getAsInt() : when.getAsInt();
-                    }
-
-                    List<TexturesPlusItem> nested = getConditionsRecur(enchants, caseNode.getAsJsonObject("model"), itemType, firstWhen, damageNode);
-                    if (isGui) {
-                        if (!nested.isEmpty()) foundItems.add(nested.getFirst());
-                    } else {
-                        foundItems.addAll(nested);
+                        List<TexturesPlusItem> nested = getConditionsRecur(enchants, caseNode.getAsJsonObject("model"), itemType, firstWhen, damageNode);
+                        if (isGui) {
+                            if (!nested.isEmpty()) foundItems.add(nested.getFirst());
+                        }
                     }
                 }
+
             }
 
             if (foundItems.isEmpty()) {

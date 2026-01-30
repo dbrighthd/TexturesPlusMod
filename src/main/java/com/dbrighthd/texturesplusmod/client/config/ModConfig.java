@@ -13,7 +13,7 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Gui.Tooltip
     public boolean cullArmor = true;
-    
+
     @ConfigEntry.Gui.Tooltip
     public boolean showElytraArmorStands = true;
 
