@@ -192,7 +192,7 @@ public class WeaponsPlusDatapackGenerator {
             lines = Files.readAllLines(txtFile, StandardCharsets.UTF_8);
         } catch (IOException e) {
             // Couldn't read => return empty map (or log it if you have a logger)
-            e.printStackTrace();
+            LOGGER.error("Error reading armor fallbacks in file {}: {}", txtFile, e.getMessage());
             return result;
         }
 
