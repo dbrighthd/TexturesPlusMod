@@ -254,8 +254,9 @@ public class TexturesPlusDatapackGeneralUtil {
                 String property = node.has("property") ? node.get("property").getAsString() : "";
                 boolean isGui = property.contains("display_context");
                 boolean isDamage = node.has("component") && node.get("component").getAsString().contains("damage");
-                boolean isTrim = property.contains("trim");
-                if(isTrim)
+                boolean isRename =  property.equals("minecraft:component") && (node.has("component") && node.get("component").getAsString().contains("custom_name"));
+                boolean isSelectNotRename = (type.equals("minecraft:select") && !isRename);
+                if(isSelectNotRename)
                 {
                     foundItems.add(getConditionsRecur(enchants, node.getAsJsonObject("fallback"), itemType, firstWhen, 0).getFirst());
                 }
