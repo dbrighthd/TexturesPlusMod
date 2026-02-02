@@ -293,7 +293,7 @@ public class TexturesPlusDatapackGeneralUtil {
         return new ItemStack(item).getMaxDamage();
     }
 
-    static String generateCommand(int x, int y, int z, String rename, String block, String direction, String command) {
+    public static String generateCommand(int x, int y, int z, String rename, String block, String direction, String command) {
         return "function texturesplus:place" + command + direction + " {x: \"" + x + "\", y: \"" + y + "\", z: \"" + z + "\",rename: \"" + rename + "\",block: \"" + block + "\"}";
     }
 }
