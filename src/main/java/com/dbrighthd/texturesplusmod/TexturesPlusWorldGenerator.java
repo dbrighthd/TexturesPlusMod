@@ -3,21 +3,25 @@ package com.dbrighthd.texturesplusmod;
 import com.dbrighthd.texturesplusmod.client.TexturesPlusModClient;
 import com.dbrighthd.texturesplusmod.datapack.*;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
+
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.LongTag;
 import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.world.level.block.Blocks;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.file.StandardCopyOption;
 import java.time.Instant;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -102,17 +106,109 @@ public class TexturesPlusWorldGenerator {
                     LOGGER.error("Failed to bump LastPlayed", e);
                 }
             }
-            try{
-                PumpkinsPlusDatapackGenerator.generatePumpkinsMcfunction();
+
+            {
+                LOGGER.info("Generating Pumpkins+ placement in world...");
+                ItemCategory REFERENCES = new ItemCategory(Blocks.RED_CONCRETE, new BlockPos(14, -53, 25), Direction.EAST);
+                ItemCategory HEADWEAR = new ItemCategory(Blocks.ORANGE_CONCRETE, new BlockPos(8, -53, 25), Direction.EAST);
+                ItemCategory ANIMALS = new ItemCategory(Blocks.YELLOW_CONCRETE, new BlockPos(2, -53, 25), Direction.EAST);
+                ItemCategory CUTESY = new ItemCategory(Blocks.LIME_CONCRETE, new BlockPos(-2, -53, 25), Direction.WEST);
+                ItemCategory MISC = new ItemCategory(Blocks.BLUE_CONCRETE, new BlockPos(-8, -53, 25), Direction.WEST);
+                ItemCategory HATS = new ItemCategory(Blocks.PURPLE_CONCRETE, new BlockPos(-14, -53, 25), Direction.WEST);
+                ItemCategory EXCLUDED = new ItemCategory(Blocks.REDSTONE_BLOCK, new BlockPos(-20, -53, 25), Direction.WEST, true);
+                ItemBasedDatapackGenerator pumpkins = new ItemBasedDatapackGenerator(
+                        Paths.get(Minecraft.getInstance().gameDirectory.getPath(), "resourcepacks", TexturesPlusModClient.getConfig().devMode ? "pumpkins" : "pumpkinsplus", "assets", "minecraft", "items", "carved_pumpkin.json"),
+                        new MapCategorySelector(List.of(
+                                Pair.of(List.of("minecraft:block/pumpkins/misc/you_saw_nothing/"), EXCLUDED), // note: the "EXCLUDED" category has excluded set to true, so the generator will skip it
+                                Pair.of(List.of("minecraft:block/pumpkins/references"), REFERENCES), // note: repeated pairs might be okay, but I don't know
+                                Pair.of(List.of("minecraft:block/pumpkins/headwear"), HEADWEAR), // note: you can omit the namespace, if you do it will only check the path
+                                Pair.of(List.of("minecraft:block/pumpkins/animals"), ANIMALS), // note: if the namespace isn't omitted, it will only match if the namespace is an exact match
+                                Pair.of(List.of("minecraft:block/pumpkins/cutesy"), CUTESY), // note: these AREN'T regex
+                                Pair.of(List.of("minecraft:block/hatsplus"), HATS), // note: technically these are serializable, which is great because it means in the future you could make these categories defined in the pack
+                                Pair.of(List.of(""), MISC) // note: an empty string will always match, so will an empty list, so this has to be last. These keys are checked in order from first to last.
+                        )),
+                        (sb, category, models) -> {
+                            if (category.excluded()) return;
+                            int zOffset = 0;
+                            for (String model : models) {
+                                sb.append(TexturesPlusDatapackGeneralUtil.generateCommand(
+                                        category.position().getX(), category.position().getY(), category.position().getZ() + zOffset,
+                                        model, BuiltInRegistries.BLOCK.getKey(category.block()).getPath(), category.direction().getName(), "pumpkin"
+                                )).append("\n");
+                                zOffset += 2;
+                            }
+                        }
+                );
+                pumpkins.generateCommands().ifSuccess((s) -> {
+                    try {
+                        Path functionPath = Paths.get(Minecraft.getInstance().gameDirectory.getPath(), "saves", "TexturesPlusGenerated", "datapacks", "texturesplus", "data", "texturesplus", "function", "allpumpkins.mcfunction");
+                        Files.writeString(functionPath, s, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+                    } catch (IOException e) {
+                        LOGGER.error("Failed to write Pumpkins+ section: ", e);
+                    }
+                }).ifError((e) -> {
+                    LOGGER.error("Failed to generate Pumpkins+ section: {}", e.message());
+                });
             }
-            catch (Exception e) {
-                LOGGER.error("Failed to generate Pumpkins+ section in : ", e);
-            }
-            try{
-                ElytrasPlusDatapackGenerator.generateElytrasMcfunction();
-            }
-            catch (Exception e) {
-                LOGGER.error("Failed to generate Elytras+ section in world: ", e);
+            {
+                LOGGER.info("Generating Elytras+ placement in world...");
+                ItemCategory BLOCKS = new ItemCategory(Blocks.RED_CONCRETE, new BlockPos(25, -53, -14), Direction.NORTH);
+                ItemCategory ANIMAL_WINGS = new ItemCategory(Blocks.ORANGE_CONCRETE, new BlockPos(25, -53, -8), Direction.NORTH);
+                ItemCategory COLOR = new ItemCategory(Blocks.YELLOW_CONCRETE, new BlockPos(25, -53, -2), Direction.NORTH);
+                ItemCategory FLAG = new ItemCategory(Blocks.LIME_CONCRETE, new BlockPos(25, -53, 2), Direction.SOUTH);
+                ItemCategory MISC = new ItemCategory(Blocks.BLUE_CONCRETE, new BlockPos(25, -53, 8), Direction.SOUTH);
+                ItemCategory CAPE = new ItemCategory(Blocks.PURPLE_CONCRETE, new BlockPos(25, -53, 14), Direction.SOUTH);
+                ItemCategory EXCLUDED = new ItemCategory(Blocks.REDSTONE_BLOCK, new BlockPos(25, -53, -20), Direction.NORTH, true);
+                ItemBasedDatapackGenerator elytras = new ItemBasedDatapackGenerator(
+                        Paths.get(Minecraft.getInstance().gameDirectory.getPath(), "resourcepacks", TexturesPlusModClient.getConfig().devMode ? "elytras" : "elytrasplus", "assets", "minecraft", "items", "elytra.json"),
+                        new MapCategorySelector(List.of(
+                                Pair.of(List.of("minecraft:item/elytras/modeled_elytras/capes/mojang"), EXCLUDED),
+                                Pair.of(List.of("minecraft:item/elytras/block_elytras"), BLOCKS),
+                                Pair.of(List.of(
+                                        "minecraft:item/elytras/bug_elytra",
+                                        "minecraft:item/elytras/parrot_wings",
+                                        "minecraft:item/elytras/animal_wings"
+                                ), ANIMAL_WINGS),
+                                Pair.of(List.of(
+                                        "minecraft:item/elytras/flag_elytras",
+                                        "minecraft:item/elytras/misc_elytras/mx_wings",
+                                        "minecraft:item/elytras/misc_elytras/brazil_wings",
+                                        "minecraft:item/elytras/pride_elytras",
+                                        "minecraft:item/elytras/misc_elytras/usa_wings"
+                                ), FLAG),
+                                Pair.of(List.of(
+                                        "minecraft:item/elytras/color_elytra",
+                                        "minecraft:item/elytras/shulker_elytras"
+                                ), COLOR),
+                                Pair.of(List.of("minecraft:item/elytras/mojang_elytras"), CAPE),
+                                Pair.of(List.of(), MISC)
+                        )),
+                        (sb, category, models) -> {
+                            if (category.excluded()) return;
+                            int xOffset = 0;
+                            for (String model : models) {
+                                boolean cape = category == CAPE; // whatever
+                                String processed = cape ? model.replace(" Elytra", "") : model;
+
+                                sb.append(TexturesPlusDatapackGeneralUtil.generateCommand(
+                                        category.position().getX() + xOffset, category.position().getY(), category.position().getZ(),
+                                        processed, BuiltInRegistries.BLOCK.getKey(category.block()).getPath(), category.direction().getName(), (cape ? "capeleytra" : "elytra") + (TexturesPlusModClient.getConfig().showElytraArmorStands ? "" : "noarmor")
+                                )).append("\n");
+                                xOffset += 2;
+                            }
+                        }
+                );
+
+                elytras.generateCommands().ifSuccess((s) -> {
+                    try {
+                        Path functionPath = Paths.get(Minecraft.getInstance().gameDirectory.getPath(), "saves", "TexturesPlusGenerated", "datapacks", "texturesplus", "data", "texturesplus", "function", "allelytras.mcfunction");
+                        Files.writeString(functionPath, s, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+                    } catch (IOException e) {
+                        LOGGER.error("Failed to write Elytras+ section: ", e);
+                    }
+                }).ifError((e) -> {
+                    LOGGER.error("Failed to generate Elytras+ section: {}", e.message());
+                });
             }
             try{
                 WeaponsPlusDatapackGenerator.generateWeaponsMcfunction();
