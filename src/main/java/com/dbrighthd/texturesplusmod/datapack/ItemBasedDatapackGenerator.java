@@ -30,7 +30,7 @@ public class ItemBasedDatapackGenerator {
         this.categorySelector = itemCategorySelector;
     }
 
-    public DataResult<String> generateCommands() {
+    public DataResult<String> generateCommands(boolean sorted) {
         JsonObject root;
         try (FileReader reader = new FileReader(itemJsonPath.toFile())) {
             root = GsonHelper.parse(reader);
@@ -86,7 +86,10 @@ public class ItemBasedDatapackGenerator {
 
         StringBuilder sb = new StringBuilder();
         for (var entry : categories.entrySet()) {
-            rowCreator.createRow(sb, entry.getKey(), entry.getValue().stream().sorted().toList());
+            rowCreator.createRow(sb, entry.getKey(),(sorted
+                    ? entry.getValue().stream().sorted()
+                    : entry.getValue().stream()
+            ).toList());
         }
 
         return DataResult.success(sb.toString());

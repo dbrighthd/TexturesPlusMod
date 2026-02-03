@@ -139,7 +139,7 @@ public class TexturesPlusWorldGenerator {
                             }
                         }
                 );
-                pumpkins.generateCommands().ifSuccess((s) -> {
+                pumpkins.generateCommands(false).ifSuccess((s) -> {
                     try {
                         Path functionPath = Paths.get(Minecraft.getInstance().gameDirectory.getPath(), "saves", "TexturesPlusGenerated", "datapacks", "texturesplus", "data", "texturesplus", "function", "allpumpkins.mcfunction");
                         Files.writeString(functionPath, s, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
@@ -199,7 +199,7 @@ public class TexturesPlusWorldGenerator {
                         }
                 );
 
-                elytras.generateCommands().ifSuccess((s) -> {
+                elytras.generateCommands(true).ifSuccess((s) -> {
                     try {
                         Path functionPath = Paths.get(Minecraft.getInstance().gameDirectory.getPath(), "saves", "TexturesPlusGenerated", "datapacks", "texturesplus", "data", "texturesplus", "function", "allelytras.mcfunction");
                         Files.writeString(functionPath, s, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
