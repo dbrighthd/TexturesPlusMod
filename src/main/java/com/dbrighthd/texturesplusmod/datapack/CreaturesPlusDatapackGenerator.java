@@ -472,7 +472,10 @@ public class CreaturesPlusDatapackGenerator {
 
         } else if (propName.equals("horse_skeleton")) {
             entityType = "skeleton_horse";
-
+        } else if (propName.equals("nautilus"))
+        {
+            nbtString += "Owner:" + nbtSlash + "\"dbrighthd" + nbtSlash + "\"";
+            rawNbtString += "Owner:" + rawNbtSlash + "\"dbrighthd" + rawNbtSlash + "\"";
         } else if (propName.equals("horse_zombie")) {
             entityType = "zombie_horse";
             nbtString = rawNbtString = "Tame:1";
