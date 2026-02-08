@@ -292,8 +292,14 @@ public class TexturesPlusDatapackGeneralUtil {
         Item item = BuiltInRegistries.ITEM.getValue(Identifier.parse(itemId));
         return new ItemStack(item).getMaxDamage();
     }
-
     public static String generateCommand(int x, int y, int z, String rename, String block, String direction, String command) {
         return "function texturesplus:place" + command + direction + " {x: \"" + x + "\", y: \"" + y + "\", z: \"" + z + "\",rename: \"" + rename + "\",block: \"" + block + "\"}";
+    }
+    public static String addMacro(String command, String macro_name, String macro_input, boolean comma)
+    {
+        String result = command + macro_name + ":\"" + macro_input + "\"";
+        if(comma)
+            result = result + ",";
+        return result;
     }
 }

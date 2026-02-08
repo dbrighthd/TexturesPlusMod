@@ -222,7 +222,12 @@ public class TexturesPlusWorldGenerator {
             catch (Exception e) {
                 LOGGER.error("Failed to generate Creatures+ section in world: ", e);
             }
-
+            try{
+                ContributorsDatapackGenerator.generateContributorsMcfunction();
+            }
+            catch (Exception e) {
+                LOGGER.error("Failed to generate Contributors section in world: ", e);
+            }
             LOGGER.info("Finished Generating World!");
         }
 

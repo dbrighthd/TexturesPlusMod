@@ -22,7 +22,6 @@ public class WeaponsPlusDatapackGenerator {
         specialBlocks = getSpecialBlocks();
         armorGroupings = getArmorGroupings();
 
-        // Path to your JSON file
         String weaponsPath = "weaponsplus";
         if (TexturesPlusModClient.getConfig().devMode) {
             weaponsPath = "weapons";
@@ -772,14 +771,6 @@ public class WeaponsPlusDatapackGenerator {
         command = addMacro(command, "rename_helmet", helmet.rename(), true);
         command = addMacro(command, "damage_helmet", helmet.damage()+"", false);
         return  command + "}";
-    }
-
-    static String addMacro(String command, String macro_name, String macro_input, boolean comma)
-    {
-        String result = command + macro_name + ":\"" + macro_input + "\"";
-        if(comma)
-            result = result + ",";
-        return result;
     }
 
     static String generateWeaponCommand(int x, int y, int z, String rename, String block, String direction, int damage, String item, String specialBlock)
