@@ -143,11 +143,16 @@ public class WeaponsPlusDatapackGenerator {
 
 
         Path functionPath = Paths.get(Minecraft.getInstance().gameDirectory.getPath(), "saves", "TexturesPlusGenerated","datapacks","texturesplus","data","texturesplus","function","allweapons.mcfunction");
-        Path functionSettingsPath = Paths.get(Minecraft.getInstance().gameDirectory.getPath(), "saves", "TexturesPlusGenerated","datapacks","texturesplus","data","texturesplus","function","armorsettings.mcfunction");
+        Path functionArmorstandSettingsPath = Paths.get(Minecraft.getInstance().gameDirectory.getPath(), "saves", "TexturesPlusGenerated","datapacks","texturesplus","data","texturesplus","function","armorsettings.mcfunction");
+        Path functionItemframeSettingsPath = Paths.get(Minecraft.getInstance().gameDirectory.getPath(), "saves", "TexturesPlusGenerated","datapacks","texturesplus","data","texturesplus","function","itemframesettings.mcfunction");
 
         if(TexturesPlusModClient.getConfig().cullArmor)
         {
-            Files.writeString(functionSettingsPath, "return 1", StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+            Files.writeString(functionArmorstandSettingsPath, "return 1", StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        }
+        if(TexturesPlusModClient.getConfig().cullItemframes)
+        {
+            Files.writeString(functionItemframeSettingsPath, "return 1", StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         }
         Files.writeString(functionPath, sb.toString(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
     }

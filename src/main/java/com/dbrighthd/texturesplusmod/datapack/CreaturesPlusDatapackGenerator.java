@@ -277,7 +277,7 @@ public class CreaturesPlusDatapackGenerator {
     }
 
     public static String createCreatureCommand(int x, int y, int z, String entity, String nbt, String rawnbt, String block, int gapsize) {
-        return "function texturesplus:creatures/placeentity"  + " {gapsize:"+ gapsize +",x:"+x+",y:"+y+",z:"+z+",entity:\"" + entity + "\",nbt:\""+ nbt + "\",block:\"" + block + "\",rawnbt:\"" + rawnbt + "\"}";
+        return "function texturesplus:creatures/placeentity"  + " {gapsize:"+ gapsize +",x:"+x+",y:"+y+",z:"+z+",entity:\"" + entity + "\",nbt:\""+ nbt + "\",block:\"" + block + "\",rawnbt:\"" + rawnbt + "\",\"silent\":" + (TexturesPlusModClient.getConfig().silentEntities ? 1 : 0) + "}";
     }
     static TexturesPlusEntity getEntityFromPropertyFile(Path propFile, Map<String,String> cemTexturePaths) throws IOException {
         Path resourceDir = Paths.get(Minecraft.getInstance().gameDirectory.getPath(),

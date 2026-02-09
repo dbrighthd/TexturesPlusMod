@@ -15,6 +15,9 @@ public class ModConfig implements ConfigData {
     public boolean cullArmor = true;
 
     @ConfigEntry.Gui.Tooltip
+    public boolean cullItemframes = true;
+
+    @ConfigEntry.Gui.Tooltip
     public boolean showElytraArmorStands = true;
 
     @ConfigEntry.Gui.Tooltip
@@ -22,6 +25,9 @@ public class ModConfig implements ConfigData {
 
     @ConfigEntry.Gui.Tooltip
     public boolean sortAlphabetically = true;
+
+    @ConfigEntry.Gui.Tooltip
+    public boolean silentEntities = true;
 
     public boolean ignoreTexturesPlusMcmeta = true;
 

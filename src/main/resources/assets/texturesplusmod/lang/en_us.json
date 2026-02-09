@@ -5,27 +5,33 @@
   "text.autoconfig.texturesplusmod.option.async.@Tooltip[1]": "Prevents the downloading button from freezing minecraft,",
   "text.autoconfig.texturesplusmod.option.updatePacksOnStartup": "Update Packs On Startup",
 
-  "text.autoconfig.texturesplusmod.option.mergeEntities": "Simplify Entities",
+  "text.autoconfig.texturesplusmod.option.mergeEntities": "Simplify Entities in T+ World",
   "text.autoconfig.texturesplusmod.option.mergeEntities.@Tooltip": "Hide some variants of entities (Angry dogs/bees)",
 
   "text.autoconfig.texturesplusmod.option.sortAlphabetically": "Sort Entities Alphabetically",
   "text.autoconfig.texturesplusmod.option.sortAlphabetically.@Tooltip": "If false, sorts by number of entities",
 
-  "text.autoconfig.texturesplusmod.option.devMode": "Dev Mode for World",
+  "text.autoconfig.texturesplusmod.option.devMode": "Dev Mode for T+ World",
   "text.autoconfig.texturesplusmod.option.devMode.@Tooltip[0]": "DO NOT ENABLE IF YOU DO NOT KNOW WHAT THIS MEANS.",
   "text.autoconfig.texturesplusmod.option.devMode.@Tooltip[1]": "Generates world from local cloned repository in resource pack folder",
   "text.autoconfig.texturesplusmod.option.devMode.@Tooltip[2]": "instead of the one downloaded from the mod.",
 
-  "text.autoconfig.texturesplusmod.option.lastPos": "Store Last Position in World",
+  "text.autoconfig.texturesplusmod.option.lastPos": "Store Last Position in T+ World",
   "text.autoconfig.texturesplusmod.option.lastPos.@Tooltip": "Copies last position & inventory",
 
-  "text.autoconfig.texturesplusmod.option.showElytraArmorStands": "Elytra Armor Stands for World",
+  "text.autoconfig.texturesplusmod.option.showElytraArmorStands": "Elytra Armor Stands for T+ World",
   "text.autoconfig.texturesplusmod.option.showElytraArmorStands.@Tooltip": "Generate armor stand with every elytra in the generated world (LAGGY IF CULLING IS DISABLED)",
 
   "text.autoconfig.texturesplusmod.option.ignoreTexturesPlusMcmeta": "Ignore Textures+ Mcmeta Version",
 
-  "text.autoconfig.texturesplusmod.option.cullArmor": "Armor Stand Culling",
+  "text.autoconfig.texturesplusmod.option.cullArmor": "Armor Stand Culling in T+ World",
   "text.autoconfig.texturesplusmod.option.cullArmor.@Tooltip": "Armor stands only render in T+ world when you are near them. Helps with lag.",
+
+  "text.autoconfig.texturesplusmod.option.cullItemframes": "Item Frame Culling in T+ World",
+  "text.autoconfig.texturesplusmod.option.cullItemframes.@Tooltip": "Item Frames only render in T+ world when you are near them. Helps with lag.",
+
+  "text.autoconfig.texturesplusmod.option.silentEntities": "Silent Entites in T+ World",
+  "text.autoconfig.texturesplusmod.option.silentEntities.@Tooltip": "Creatures+ animals are silent in the T+ world",
 
   "text.autoconfig.texturesplusmod.option.githubApiKey": "GitHub Access Token",
   "text.autoconfig.texturesplusmod.option.githubApiKey.@Tooltip[0]": "A GitHub fine-grained personal access token.",

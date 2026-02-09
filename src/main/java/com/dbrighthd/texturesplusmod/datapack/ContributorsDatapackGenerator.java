@@ -4,24 +4,17 @@ import com.dbrighthd.texturesplusmod.client.TexturesPlusModClient;
 import com.google.gson.reflect.TypeToken;
 import net.minecraft.client.Minecraft;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
-import java.util.*;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
-import java.io.IOException;
 import java.io.Reader;
 import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
 import static com.dbrighthd.texturesplusmod.TexturesPlusMod.LOGGER;
 import static com.dbrighthd.texturesplusmod.datapack.TexturesPlusDatapackGeneralUtil.*;
-import static com.dbrighthd.texturesplusmod.datapack.TexturesPlusDatapackGeneralUtil.addAllElementsToListOfList;
 import static net.fabricmc.fabric.impl.resource.pack.ModPackResourcesUtil.GSON;
 
 public class ContributorsDatapackGenerator {
