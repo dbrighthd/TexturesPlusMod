@@ -476,6 +476,18 @@ public class CreaturesPlusDatapackGenerator {
         {
             nbtString += "Owner:" + nbtSlash + "\"dbrighthd" + nbtSlash + "\"";
             rawNbtString += "Owner:" + rawNbtSlash + "\"dbrighthd" + rawNbtSlash + "\"";
+        } else if (propName.contains("zombie_nautilus"))
+        {
+            String variant = "temperate";
+            if(propName.contains("coral"))
+            {
+                variant = "warm";
+            }
+            entityType = "zombie_nautilus";
+            nbtString = formatNbt("variant", variant, nbtSlash);
+            rawNbtString = formatNbt("variant", variant, rawNbtSlash);
+            nbtString += ",Owner:" + nbtSlash + "\"dbrighthd" + nbtSlash + "\"";
+            rawNbtString += ",Owner:" + rawNbtSlash + "\"dbrighthd" + rawNbtSlash + "\"";
         } else if (propName.equals("horse_zombie")) {
             entityType = "zombie_horse";
             nbtString = rawNbtString = "Tame:1";
