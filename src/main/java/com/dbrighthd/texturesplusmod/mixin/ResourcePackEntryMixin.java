@@ -6,7 +6,7 @@ import com.dbrighthd.texturesplusmod.pack.TexturesPlusMetadata;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.BelowOrAboveWidgetTooltipPositioner;
 import net.minecraft.client.gui.screens.packs.PackSelectionModel;
 import net.minecraft.client.gui.screens.packs.TransferableSelectionList;
@@ -36,8 +36,8 @@ public class ResourcePackEntryMixin {
 
     @Unique private final PackMetadataManager metadataManager = TexturesPlusModClient.getMetadataManager();
 
-    @Inject(method = "renderContent", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/packs/repository/PackCompatibility;isCompatible()Z", ordinal = 0))
-    public void renderYellowBackground(GuiGraphics context, int mouseX, int mouseY, boolean hovered, float deltaTicks, CallbackInfo ci) {
+    @Inject(method = "extractContent", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/packs/repository/PackCompatibility;isCompatible()Z", ordinal = 0))
+    public void renderYellowBackground(GuiGraphicsExtractor context, int mouseX, int mouseY, boolean hovered, float deltaTicks, CallbackInfo ci) {
         TexturesPlusMetadata metadata = metadataManager.getMetadataForPack(pack.getId());
         if (metadata != null) {
             int x = ((TransferableSelectionList.PackEntry) (Object) this).getContentX() - 1;
@@ -52,8 +52,8 @@ public class ResourcePackEntryMixin {
         }
     }
 
-    @Inject(method = "renderContent", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/packs/repository/PackCompatibility;isCompatible()Z", ordinal = 1))
-    public void renderCompatibilityMessage(GuiGraphics context, int mouseX, int mouseY, boolean hovered, float deltaTicks, CallbackInfo ci) {
+    @Inject(method = "extractContent", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/packs/repository/PackCompatibility;isCompatible()Z", ordinal = 1))
+    public void renderCompatibilityMessage(GuiGraphicsExtractor context, int mouseX, int mouseY, boolean hovered, float deltaTicks, CallbackInfo ci) {
         TexturesPlusMetadata metadata = metadataManager.getMetadataForPack(pack.getId());
         if (metadata != null) {
             if (!metadata.areRequiredModsPresent()) {
@@ -66,8 +66,8 @@ public class ResourcePackEntryMixin {
         }
     }
 
-    @Inject(method = "renderContent", at = @At(value = "TAIL"))
-    public void renderModListTooltip(GuiGraphics context, int mouseX, int mouseY, boolean hovered, float deltaTicks, CallbackInfo ci) {
+    @Inject(method = "extractContent", at = @At(value = "TAIL"))
+    public void renderModListTooltip(GuiGraphicsExtractor context, int mouseX, int mouseY, boolean hovered, float deltaTicks, CallbackInfo ci) {
         if (hovered) {
             TexturesPlusMetadata metadata = metadataManager.getMetadataForPack(pack.getId());
             if (metadata != null) {
@@ -93,7 +93,7 @@ public class ResourcePackEntryMixin {
         }
     }
 
-    @Redirect(method = {"renderContent", "handlePackSelection"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/server/packs/repository/PackCompatibility;isCompatible()Z"))
+    @Redirect(method = {"extractContent", "handlePackSelection"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/server/packs/repository/PackCompatibility;isCompatible()Z"))
     public boolean redirectIsCompatible(PackCompatibility compatibility) {
         return compatibility.isCompatible() || (metadataManager.getMetadataForPack(pack.getId()) != null && TexturesPlusModClient.getConfig().ignoreTexturesPlusMcmeta);
     }

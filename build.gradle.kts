@@ -1,6 +1,6 @@
 plugins {
     id("application")
-    id("fabric-loom") version "1.15-SNAPSHOT"
+    id("net.fabricmc.fabric-loom") version "1.15-SNAPSHOT"
     id("maven-publish")
     id("java")
 }
@@ -19,13 +19,12 @@ dependencies {
     // PLEASE add dependencies that way too. See https://docs.gradle.org/current/userguide/version_catalogs.html for fancy documentation
     // (or just look at how I do it there)
     minecraft(libs.minecraft)
-    mappings(loom.officialMojangMappings())
-    modImplementation(libs.fabric.loader)
+    implementation(libs.fabric.loader)
 
-    modImplementation(libs.fabric.api)
-    modImplementation(libs.modmenu)
+    implementation(libs.fabric.api)
+    implementation(libs.modmenu)
 
-    modApi(libs.cloth.config) {
+    api(libs.cloth.config) {
         exclude(group = libs.fabric.api.get().group)
     }
 }
@@ -42,7 +41,7 @@ tasks.processResources {
     }
 }
 
-val targetJavaVersion = 21
+val targetJavaVersion = 25
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
     if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible) {

@@ -7,7 +7,7 @@ import org.lwjgl.glfw.GLFW;
 import java.util.List;
 import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.TextAlignment;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineLabel;
@@ -67,10 +67,10 @@ public class ReloadPrompt extends Screen {
     }
 
     @Override
-    public void render(@NonNull GuiGraphics context, int mouseX, int mouseY, float delta) {
-        super.render(context, mouseX, mouseY, delta);
+    public void extractRenderState(@NonNull GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
+        super.extractRenderState(context, mouseX, mouseY, delta);
 
-        context.drawCenteredString(this.font, this.title, this.width / 2, 70, CommonColors.WHITE);
+        context.centeredText(this.font, this.title, this.width / 2, 70, CommonColors.WHITE);
 
         this.messageSplit.visitLines(TextAlignment.CENTER, this.width / 2, 90, 9, context.textRenderer());
     }

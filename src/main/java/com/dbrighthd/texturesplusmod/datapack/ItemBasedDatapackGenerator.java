@@ -53,11 +53,11 @@ public class ItemBasedDatapackGenerator {
                 ItemModel.Unbaked model = c.model();
                 Identifier modelId;
                 switch (model) {
-                    case BlockModelWrapper.Unbaked bmodel ->  // a "BlockModelWrapper" model is a "basic" item model, the "model" type model
+                    case CuboidItemModelWrapper.Unbaked bmodel ->  // a "BlockModelWrapper" model is a "basic" item model, the "model" type model
                             modelId = bmodel.model();
                     case SelectItemModel.Unbaked smodel -> {
                         ItemModel.Unbaked fallback = smodel.fallback().orElseThrow();
-                        if (!(fallback instanceof BlockModelWrapper.Unbaked bmodel)) { // we could keep going and keep going down this path, but it would suck so
+                        if (!(fallback instanceof CuboidItemModelWrapper.Unbaked bmodel)) { // we could keep going and keep going down this path, but it would suck so
                             LOGGER.error("{} had a weird model in it, skipping... (fallback is a complex model)", itemJsonPath.toAbsolutePath());
                             return;
                         }
@@ -65,7 +65,7 @@ public class ItemBasedDatapackGenerator {
                     }
                     case ConditionalItemModel.Unbaked cmodel -> {
                         ItemModel.Unbaked onFalse = cmodel.onFalse();
-                        if (!(onFalse instanceof BlockModelWrapper.Unbaked bmodel)) { // we could keep going and keep going down this path, but it would suck so
+                        if (!(onFalse instanceof CuboidItemModelWrapper.Unbaked bmodel)) { // we could keep going and keep going down this path, but it would suck so
                             LOGGER.error("{} had a weird model in it, skipping... (condition on_false is a complex model)", itemJsonPath.toAbsolutePath());
                             return;
                         }

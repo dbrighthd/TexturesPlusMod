@@ -1,6 +1,6 @@
 package com.dbrighthd.texturesplusmod.client.screen;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -60,7 +60,7 @@ public class AsyncTexturesPlusButton<T> extends AbstractButton {
     }
 
     @Override
-    public void renderContents(@NonNull GuiGraphics context, int mouseX, int mouseY, float delta) {
+    public void extractContents(@NonNull GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
         deltaAccumulator += delta;
         if (deltaAccumulator*1000 >= 200) { // ticks are 4x slower because methinks the animation would look nicer
             deltaAccumulator = 0;
