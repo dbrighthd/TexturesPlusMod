@@ -618,12 +618,17 @@ public class WeaponsPlusDatapackGenerator {
                 }
                 else
                 {
-                    sb.append("function texturesplus:weapons/placemultweapons").append(direction).append("startenchant {block:\"").append(block).append("\", x:").append(x).append(",y:").append(y).append(",z:").append(z).append(",enchantment:").append(section.getFirst().enchantments().getFirst().replace("minecraft:", "")).append("}\n");
-                    int num = 0;
-                    for(TexturesPlusItem item : section)
+                    try {
+                        sb.append("function texturesplus:weapons/placemultweapons").append(direction).append("startenchant {block:\"").append(block).append("\", x:").append(x).append(",y:").append(y).append(",z:").append(z).append(",enchantment:").append(section.getFirst().enchantments().getFirst().replace("minecraft:", "")).append("}\n");
+                        int num = 0;
+                        for (TexturesPlusItem item : section) {
+                            sb.append(generateWeaponMultCommandEnchant(x, y, z, item.rename(), block, direction, item.damage(), item.enchantments().getFirst(), item.itemType(), getSpecialBlock(item.itemType(), block), num)).append("\n");
+                            num++;
+                        }
+                    }
+                    catch (NoSuchElementException e)
                     {
-                        sb.append(generateWeaponMultCommandEnchant(x,y,z, item.rename(),block,direction, item.damage(), item.enchantments().getFirst(), item.itemType(),getSpecialBlock(item.itemType(), block), num)).append("\n");
-                        num++;
+                        LOGGER.error("Failed to load item: " + section.getFirst().rename() +" Rename of +" + section.getFirst().itemType() + " , Enchantments: " + (section.getFirst().enchantments().isEmpty() ? "none" : section.getFirst().enchantments().getFirst()) +  ", Error: " + e);
                     }
                 }
                 x-=1;
@@ -642,11 +647,11 @@ public class WeaponsPlusDatapackGenerator {
             {
                 if(sortedSection.getFirst().size() == 1)
                 {
-                    sb.append(generateArmorCommand(x,y,z,sortedSection.getFirst().getFirst(),block,getSpecialBlock(sortedSection.getFirst().getFirst().itemType(),block), defaultXOffset, 0) + "\n");
+                    sb.append(generateArmorCommand(x, y, z, sortedSection.getFirst().getFirst(), block, getSpecialBlock(sortedSection.getFirst().getFirst().itemType(), block), defaultXOffset, 0)).append("\n");
                 }
                 else
                 {
-                    sb.append(generateArmorSetCommand(x,y,z,sortedSection.getFirst(),block, defaultXOffset, 0)+"\n");
+                    sb.append(generateArmorSetCommand(x, y, z, sortedSection.getFirst(), block, defaultXOffset, 0)).append("\n");
                 }
                 x -= defaultXOffset;
             }
