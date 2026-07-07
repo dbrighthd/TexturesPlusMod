@@ -109,12 +109,12 @@ public class TexturesPlusWorldGenerator {
 
             {
                 LOGGER.info("Generating Pumpkins+ placement in world...");
-                ItemCategory REFERENCES = new ItemCategory(Blocks.RED_CONCRETE, new BlockPos(14, -53, 25), Direction.EAST);
-                ItemCategory HEADWEAR = new ItemCategory(Blocks.ORANGE_CONCRETE, new BlockPos(8, -53, 25), Direction.EAST);
-                ItemCategory ANIMALS = new ItemCategory(Blocks.YELLOW_CONCRETE, new BlockPos(2, -53, 25), Direction.EAST);
-                ItemCategory CUTESY = new ItemCategory(Blocks.LIME_CONCRETE, new BlockPos(-2, -53, 25), Direction.WEST);
-                ItemCategory MISC = new ItemCategory(Blocks.BLUE_CONCRETE, new BlockPos(-8, -53, 25), Direction.WEST);
-                ItemCategory HATS = new ItemCategory(Blocks.PURPLE_CONCRETE, new BlockPos(-14, -53, 25), Direction.WEST);
+                ItemCategory REFERENCES = new ItemCategory(Blocks.CONCRETE.red(), new BlockPos(14, -53, 25), Direction.EAST);
+                ItemCategory HEADWEAR = new ItemCategory(Blocks.CONCRETE.orange(), new BlockPos(8, -53, 25), Direction.EAST);
+                ItemCategory ANIMALS = new ItemCategory(Blocks.CONCRETE.yellow(), new BlockPos(2, -53, 25), Direction.EAST);
+                ItemCategory CUTESY = new ItemCategory(Blocks.CONCRETE.lime(), new BlockPos(-2, -53, 25), Direction.WEST);
+                ItemCategory MISC = new ItemCategory(Blocks.CONCRETE.blue(), new BlockPos(-8, -53, 25), Direction.WEST);
+                ItemCategory HATS = new ItemCategory(Blocks.CONCRETE.purple(), new BlockPos(-14, -53, 25), Direction.WEST);
                 ItemCategory EXCLUDED = new ItemCategory(Blocks.REDSTONE_BLOCK, new BlockPos(-20, -53, 25), Direction.WEST, true);
                 ItemBasedDatapackGenerator pumpkins = new ItemBasedDatapackGenerator(
                         Paths.get(Minecraft.getInstance().gameDirectory.getPath(), "resourcepacks", TexturesPlusModClient.getConfig().devMode ? "pumpkins" : "pumpkinsplus", "assets", "minecraft", "items", "carved_pumpkin.json"),
@@ -152,12 +152,12 @@ public class TexturesPlusWorldGenerator {
             }
             {
                 LOGGER.info("Generating Elytras+ placement in world...");
-                ItemCategory BLOCKS = new ItemCategory(Blocks.RED_CONCRETE, new BlockPos(25, -53, -14), Direction.NORTH);
-                ItemCategory ANIMAL_WINGS = new ItemCategory(Blocks.ORANGE_CONCRETE, new BlockPos(25, -53, -8), Direction.NORTH);
-                ItemCategory COLOR = new ItemCategory(Blocks.YELLOW_CONCRETE, new BlockPos(25, -53, -2), Direction.NORTH);
-                ItemCategory FLAG = new ItemCategory(Blocks.LIME_CONCRETE, new BlockPos(25, -53, 2), Direction.SOUTH);
-                ItemCategory MISC = new ItemCategory(Blocks.BLUE_CONCRETE, new BlockPos(25, -53, 8), Direction.SOUTH);
-                ItemCategory CAPE = new ItemCategory(Blocks.PURPLE_CONCRETE, new BlockPos(25, -53, 14), Direction.SOUTH);
+                ItemCategory BLOCKS = new ItemCategory(Blocks.CONCRETE.red(), new BlockPos(25, -53, -14), Direction.NORTH);
+                ItemCategory ANIMAL_WINGS = new ItemCategory(Blocks.CONCRETE.orange(), new BlockPos(25, -53, -8), Direction.NORTH);
+                ItemCategory COLOR = new ItemCategory(Blocks.CONCRETE.yellow(), new BlockPos(25, -53, -2), Direction.NORTH);
+                ItemCategory FLAG = new ItemCategory(Blocks.CONCRETE.lime(), new BlockPos(25, -53, 2), Direction.SOUTH);
+                ItemCategory MISC = new ItemCategory(Blocks.CONCRETE.blue(), new BlockPos(25, -53, 8), Direction.SOUTH);
+                ItemCategory CAPE = new ItemCategory(Blocks.CONCRETE.purple(), new BlockPos(25, -53, 14), Direction.SOUTH);
                 ItemCategory EXCLUDED = new ItemCategory(Blocks.REDSTONE_BLOCK, new BlockPos(25, -53, -20), Direction.NORTH, true);
                 ItemBasedDatapackGenerator elytras = new ItemBasedDatapackGenerator(
                         Paths.get(Minecraft.getInstance().gameDirectory.getPath(), "resourcepacks", TexturesPlusModClient.getConfig().devMode ? "elytras" : "elytrasplus", "assets", "minecraft", "items", "elytra.json"),

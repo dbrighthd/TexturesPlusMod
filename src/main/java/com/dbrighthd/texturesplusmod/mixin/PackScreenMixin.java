@@ -73,7 +73,7 @@ public abstract class PackScreenMixin extends Screen {
                     22, (this.height - 40), 22, 22,
                     Component.translatable("texturesplusmod.open_tooltip"), Component.translatable("texturesplusmod.open_tooltip"),
                     () -> {
-                        previousScreen.set(Minecraft.getInstance().screen);
+                        previousScreen.set(Minecraft.getInstance().gui.screen());
                         previouslyEnabledPacks.set(resourcePackManager.getSelectedIds());
                         boolean async = TexturesPlusModClient.getConfig().async;
                         CompletableFuture<Pair<String, Boolean>> elytras = PackDownloader.downloadResourcePack("elytras", !async);
@@ -93,18 +93,18 @@ public abstract class PackScreenMixin extends Screen {
 
                         if (TexturesPlusModClient.getConfig().async) {
                             Minecraft.getInstance().execute(() -> {
-                                Screen screenToReturnTo = Minecraft.getInstance().screen;
-                                Minecraft.getInstance().setScreen(new ReloadPrompt((confirmed) -> {
+                                Screen screenToReturnTo = Minecraft.getInstance().gui.screen();
+                                Minecraft.getInstance().gui.setScreen(new ReloadPrompt((confirmed) -> {
                                     if (!confirmed) return;
 
-                                    if (Minecraft.getInstance().screen == screenToReturnTo) previousScreen.get().onClose();
+                                    if (Minecraft.getInstance().gui.screen() == screenToReturnTo) previousScreen.get().onClose();
 
                                     // keep packs enabled, then rescan
                                     resourcePackManager.setSelected(previouslyEnabledPacks.get());
                                     resourcePackManager.reload();
 
-                                    if (Minecraft.getInstance().screen != screenToReturnTo) {
-                                        Minecraft.getInstance().setScreen(screenToReturnTo);
+                                    if (Minecraft.getInstance().gui.screen() != screenToReturnTo) {
+                                        Minecraft.getInstance().gui.setScreen(screenToReturnTo);
                                     }
                                 }, false));
                             });

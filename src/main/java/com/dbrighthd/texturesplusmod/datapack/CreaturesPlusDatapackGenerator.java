@@ -360,9 +360,9 @@ public class CreaturesPlusDatapackGenerator {
 
         if (propName.equals("wither") && TexturesPlusModClient.getConfig().mergeEntities) return null;
 
-        if (propName.endsWith("_cow")) {
+        if (propName.startsWith("cow_")) {
             entityType = "cow";
-            String variant = propName.replace("_cow", "");
+            String variant = propName.replace("cow_", "");
             nbtString = formatNbt("variant", variant, nbtSlash);
             rawNbtString = formatNbt("variant", variant, rawNbtSlash);
 
@@ -458,9 +458,9 @@ public class CreaturesPlusDatapackGenerator {
             int variant = selectVariant(propName, Map.of("white", 1, "brown", 2, "gray", 3));
             nbtString = rawNbtString = "Variant:" + variant;
 
-        } else if (propName.endsWith("chicken")) {
+        } else if (propName.startsWith("chicken")) {
             entityType = "chicken";
-            String variant = propName.replace("_chicken", "");
+            String variant = propName.replace("chicken_i ", "");
             nbtString = formatNbt("variant", variant, nbtSlash);
             rawNbtString = formatNbt("variant", variant, rawNbtSlash);
 
@@ -511,15 +511,15 @@ public class CreaturesPlusDatapackGenerator {
                 nbtString = rawNbtString = "HasNectar:1";
             }
 
-        } else if (propName.endsWith("_pig")) {
+        } else if (propName.startsWith("pig_")) {
             entityType = "pig";
-            String variant = propName.replace("_pig", "");
+            String variant = propName.replace("pig_", "");
             nbtString = formatNbt("variant", variant, nbtSlash);
             rawNbtString = formatNbt("variant", variant, rawNbtSlash);
 
-        } else if (propName.endsWith("_frog")) {
+        } else if (propName.startsWith("frog_")) {
             entityType = "frog";
-            String variant = propName.replace("_frog", "");
+            String variant = propName.replace("frog_", "");
             nbtString = formatNbt("variant", variant, nbtSlash);
             rawNbtString = formatNbt("variant", variant, rawNbtSlash);
 

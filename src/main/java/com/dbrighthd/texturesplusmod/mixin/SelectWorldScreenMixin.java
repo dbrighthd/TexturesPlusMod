@@ -33,7 +33,7 @@ public abstract class SelectWorldScreenMixin extends Screen {
                 Component.translatable("texturesplusmod.open_tooltip"), Component.translatable("texturesplusmod.open_tooltip"),
                 TexturesPlusWorldGenerator::generateWorldAsync,
                 ($) -> Minecraft.getInstance().execute(() -> {
-                    Minecraft.getInstance().setScreen(new SelectWorldScreen(this.lastScreen));
+                    Minecraft.getInstance().gui.setScreen(new SelectWorldScreen(this.lastScreen));
                 })
         );
 
